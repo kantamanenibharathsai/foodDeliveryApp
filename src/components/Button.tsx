@@ -1,18 +1,24 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import {responsiveFontSize} from 'react-native-responsive-dimensions';
-import { colors } from '../utils/Colors';
-import { fonts } from '../constants/fonts';
-
+import {colors} from '../utils/Colors';
+import {fonts} from '../constants/fonts';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  style?: object;
-  textStyle?: object;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
-export default class Button extends Component<ButtonProps> {
+export default class CustomButton extends Component<ButtonProps> {
   render() {
     const {title, onPress, style, textStyle} = this.props;
 
@@ -28,20 +34,24 @@ export default class Button extends Component<ButtonProps> {
 
 const styles = StyleSheet.create({
   buttonContainer: {
+    width: 375,
+    height: 75,
+    alignSelf: 'center',
     borderRadius: 60,
     paddingVertical: 16,
     paddingHorizontal: 18,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.green,
+    marginVertical: 10,
+    // Shadow for iOS
     shadowColor: '#94CD00',
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 25,
-    elevation: 20,
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6, // Opacity control similar to alpha (#94CD0099)
+    shadowRadius: 25, // Blurred radius
+
+    // Shadow for Android
+    elevation: 12,
   },
   buttonText: {
     color: '#FFFFFF',

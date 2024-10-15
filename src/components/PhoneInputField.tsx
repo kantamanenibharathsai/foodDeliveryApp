@@ -87,7 +87,6 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
           {placeholderVisible && (
             <Text style={styles.placeholderText}>Mobile No</Text>
           )}
-
           <Image source={phoneIcon} style={styles.inputIcon} />
         </View>
 
@@ -162,12 +161,12 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: colors.black,
-    fontSize: 18, // Updated font size
+    fontSize: 18,
     paddingLeft: 10,
   },
   placeholderText: {
     position: 'absolute',
-    left: 130,
+    left: 138,
     top: 11,
     color: colors.black,
     fontFamily: fonts.montserrat.extraBold,
@@ -197,11 +196,13 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     marginLeft: 10,
+    marginRight: -5,
   },
   errorText: {
-    color: 'red',
-    fontSize: 12,
+    color: colors.red,
+    fontSize: 11,
     marginTop: 5,
+    fontFamily: fonts.montserrat.medium,
   },
   commonText: {
     fontSize: 14,

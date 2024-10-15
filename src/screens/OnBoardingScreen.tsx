@@ -15,7 +15,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import SkipIcon from 'react-native-vector-icons/Ionicons';
-import {ImagesState, onBoardingImagesData} from '../utils/OnBoardingImagesData';
+import {ImagesState, onBoardingImagesData} from '../utils/Data';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 
@@ -125,20 +125,14 @@ const styles = StyleSheet.create({
   circleImgStyle: {
     position: 'absolute',
     bottom: Platform.OS === 'android' ? -38 : 0,
-    // width: '100%',
     height: '43%',
     width:
       Platform.OS === 'android' ? responsiveWidth(100) : responsiveWidth(99),
     resizeMode: 'cover',
-    // zIndex: 0
   },
   onBoardingContainer: {
     height: '100%',
     width: '100%',
-    // borderWidth: 3,
-    // borderColor: colors.green,
-    // borderRadius: 100,
-    // overflow: 'hidden',
   },
   continueBtnStyle: {
     position: 'absolute',
@@ -152,8 +146,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 100,
     bottom: Platform.OS === 'android' ? '17%' : '21%',
-    // borderWidth: 3,
-    // borderColor: colors.green,
     alignItems: 'center',
     justifyContent: 'center',
     width: responsiveWidth(100),
@@ -185,7 +177,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   paginationContainer: {
-    // marginTop: Platform.OS === 'ios' ? 10 : 30,
     position: 'absolute',
     alignSelf: 'center',
     bottom: Platform.OS === 'ios' ? 55 : 55,

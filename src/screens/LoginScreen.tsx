@@ -262,6 +262,8 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import PhoneInputField from '../components/PhoneInputField';
 import {OtpInput} from 'react-native-otp-entry';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../components/Button';
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -273,7 +275,7 @@ const validationSchema = Yup.object().shape({
 });
 
 class LoginScreen extends Component {
-  constructor(props : any) {
+  constructor(props: any) {
     super(props);
     this.state = {
       otp: '',
@@ -345,10 +347,8 @@ class LoginScreen extends Component {
           <OtpInput
             numberOfDigits={6}
             focusColor="green"
-            secureTextEntry={true} // Use true to enforce asterisk display
-            // onTextChange={this.handleOtpChange} // Custom handler
+            secureTextEntry={false}
             onFilled={text => console.log(`OTP complete: ${text}`)}
-            // value={this.state.otp} // Bind to the state for dynamic updates
             textInputProps={{
               accessibilityLabel: 'One-Time Password',
             }}
@@ -360,7 +360,32 @@ class LoginScreen extends Component {
               focusedPinCodeContainerStyle: styles.activePinCodeBox,
             }}
           />
+          <Text style={styles.forgotPasscodeText}>Forgot Passcode</Text>
+
+          <View style={styles.custoSellerContainer}>
+            <View style={styles.radioLabelCont}>
+              <MaterialIcons
+                name="radio-button-checked"
+                size={20}
+                color={colors.red}
+              />
+              <Text style={styles.radioLabel}>Customer</Text>
+            </View>
+            <View style={styles.radioLabelCont}>
+              <MaterialIcons
+                name="radio-button-checked"
+                size={20}
+                color={'grey'}
+              />
+              <Text style={styles.radioLabel}>Seller</Text>
+            </View>
+          </View>
         </View>
+        <CustomButton
+          title="Login"
+          onPress={() => console.log('Button Pressed')}
+        />
+        <Text style={styles.registerText}>Register now?</Text>
       </View>
     );
   }
@@ -445,6 +470,43 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     height: 2,
     width: '60%',
+  },
+  forgotPasscodeText: {
+    marginTop: -10,
+    fontSize: 16,
+    color: colors.red,
+    alignSelf: 'flex-end',
+    fontWeight: '600',
+    fontFamily: fonts.montserrat.medium,
+  },
+  custoSellerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    gap: 40,
+  },
+  radioLabelCont: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+    gap: 7,
+  },
+  radioLabel: {
+    fontSize: 18,
+    color: colors.black,
+    fontFamily: fonts.montserrat.medium,
+    lineHeight: 28,
+    fontWeight: '700',
+  },
+  registerText: {
+    fontFamily: fonts.montserrat.bold,
+    fontWeight: '600',
+    fontSize: 18,
+    color: colors.black,
+    alignSelf: 'center',
+    marginTop: 10,
   },
 });
 
