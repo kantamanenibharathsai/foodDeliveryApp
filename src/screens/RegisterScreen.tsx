@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {emailImg, personImg, registerTopImg} from '../assets';
+import { otpEmailImg, personImg, registerTopImg} from '../assets';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
@@ -151,7 +151,7 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                     onChangeText={handleChange('email')}
                     onBlur={handleBlur('email')}
                   />
-                  <Image style={styles.icon} source={emailImg} />
+                  <Image style={styles.icon} source={otpEmailImg} />
                   {!this.state.emailFocused && values.email === '' && (
                     <Text style={styles.placeholder}>Email Id</Text>
                   )}

@@ -8,8 +8,15 @@ import OnBoardingScreen from './src/screens/OnBoardingScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import OtpVerificationScreen from './src/screens/VerificationScreen';
 import AllowLocationScreen from './src/screens/AllowLocationScreen';
+import ForgotPasscodeScreen from './src/screens/ForgotPasscodeScreen';
+import OtpVerificationForgotPasscodeScreen from './src/screens/OtpVerificationForgotPasscodeScreen';
+import SetNewPasscodeScreen from './src/screens/SetNewPasscodeScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import BottomTabNavigation from './src/navigations/BottomTabNavigation';
+
 
 const Stack = createNativeStackNavigator();
+
 
 const App = () => {
   return (
@@ -21,7 +28,7 @@ const App = () => {
       />
       <Stack.Navigator
         screenOptions={{headerShown: false}}
-        initialRouteName="AllowlocationScreen">
+        initialRouteName="HomeScreen">
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -34,6 +41,20 @@ const App = () => {
           name="AllowlocationScreen"
           component={AllowLocationScreen}
         />
+        <Stack.Screen
+          name="ForgotPasscodeScreen"
+          component={ForgotPasscodeScreen}
+        />
+        <Stack.Screen
+          name="OtpVerificationForgotPasscodeScreen"
+          component={OtpVerificationForgotPasscodeScreen}
+        />
+        <Stack.Screen
+          name="SetNewPasscodeScreen"
+          component={SetNewPasscodeScreen}
+        />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="BottomTab" component={BottomTabNavigation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

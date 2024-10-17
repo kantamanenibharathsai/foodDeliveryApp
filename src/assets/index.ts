@@ -1,9 +1,7 @@
-import { otpEmail } from './index';
 export const loginRedBg = require('./images/loginRed.png');
 export const loginFoodPlateBg = require('./images/foodPlate.png');
 export const phoneIcon = require('./images/phoneIcon.png');
 export const downArrowIcon = require('./images/arrowLeft.png');
-
 export const spalshScreen1 = require('../assets/images/Splash1.png');
 export const spalshScreen2 = require('../assets/images/Splash2.png');
 export const onBoardingScreen1 = require('../assets/images/OnBoarding1.jpg');
@@ -23,3 +21,11 @@ export const otpEmailImg = require('../assets/images/OtpEmailImg.png');
 export const otpBgImg = require('../assets/images/otpBanner.png');
 export const resendIconImg = require("../assets/images/resendIcon.png");
 export const allowLocationImg = require("../assets/images/allowLocationImg.png");
+export const forgotPasscodeImg = require("../assets/images/ForgotPasscodeBg.png");
+export const questionMarkImg = require("../assets/images/QuestionMark.png");
+export const otpVerifiForgotPassBgImg = require("../assets/images/OtpVerificationForgotPassBg.png");
+export const userProfileImg = require("../assets/images/userProfile.png");
+export const pizzaImg = require("../assets/images/pizza.png");
+export const burgerImg = require("../assets/images/burger.png");
+export const chickenImg = require("../assets/images/chicken.png");
+export const homeCarouselImg = require("../assets/images/homeCarouselImg.png");

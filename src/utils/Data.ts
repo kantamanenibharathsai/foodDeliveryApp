@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native";
+import { burgerImg, chickenImg, pizzaImg } from "../assets";
 
 export interface ImagesState {
   id: number;
@@ -92,3 +93,9 @@ export const statesData: StatesInterface[] = [
   { "id": 36, "name": "Jammu and Kashmir" }
 ]
 
+export interface FoodHomeImageInterface {
+  id: number;
+  image: ImageSourcePropType;
+}
+
+export const foodHomeImages = [{ id: 1, image: pizzaImg }, { id: 2, image: burgerImg }, { id: 3, image: chickenImg }]

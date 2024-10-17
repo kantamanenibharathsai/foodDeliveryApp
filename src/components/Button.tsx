@@ -44,13 +44,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.green,
     marginVertical: 10,
-    // Shadow for iOS
     shadowColor: '#94CD00',
     shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 0.6, // Opacity control similar to alpha (#94CD0099)
-    shadowRadius: 25, // Blurred radius
-
-    // Shadow for Android
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
     elevation: 12,
   },
   buttonText: {
