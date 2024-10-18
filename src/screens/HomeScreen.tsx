@@ -7,11 +7,13 @@ import {
   StatusBar,
   Platform,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import {userProfileImg} from '../assets';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
 import {
+  responsiveFontSize,
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
@@ -19,50 +21,73 @@ import IonicIcons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {foodHomeImages} from '../utils/Data';
 import HomeCarousal from '../components/HomeCarousel';
+import BestChoiceHome from '../components/BestChoiceHome';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import TodaySpecial from '../components/TodaySpecial';
 
 class HomeScreen extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.profileContainer}>
-          <View style={styles.imgTextContainer}>
-            <View style={styles.imgCont}>
-              <Image source={userProfileImg} style={styles.profileImg} />
+      <ScrollView style={styles.container}>
+        <View>
+          <View style={styles.profileContainer}>
+            <View style={styles.imgTextContainer}>
+              <View style={styles.imgCont}>
+                <Image source={userProfileImg} style={styles.profileImg} />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.userName}>Hi, Sachin</Text>
+                <View style={styles.locationContainer}>
+                  <IonicIcons
+                    name="location-sharp"
+                    size={18}
+                    color={colors.greyColor}
+                  />
+                  <Text style={styles.locationText}>Nagpur, Maharashtra</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.textContainer}>
-              <Text style={styles.userName}>Hi, Sachin</Text>
-              <View style={styles.locationContainer}>
-                <IonicIcons
-                  name="location-sharp"
-                  size={18}
-                  color={colors.greyColor}
-                />
-                <Text style={styles.locationText}>Nagpur, Maharashtra</Text>
+            <View style={styles.notificationContainer}>
+              <MaterialCommunityIcons
+                name="bell-outline"
+                size={42}
+                color={colors.black}
+              />
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>10+</Text>
               </View>
             </View>
           </View>
-          <View style={styles.notificationContainer}>
-            <MaterialCommunityIcons
-              name="bell-outline"
-              size={42}
-              color={colors.black}
-            />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>10+</Text>
-            </View>
+          <FlatList
+            contentContainerStyle={styles.flatListHomeStyle}
+            horizontal
+            data={foodHomeImages}
+            renderItem={({item}) => (
+              <Image style={styles.foodImg} source={item.image} />
+            )}
+            showsHorizontalScrollIndicator={false}
+          />
+          <HomeCarousal />
+          <View style={styles.bestChoiceContainer}>
+            <Text style={styles.commonTxt}>Best Choice</Text>
+            <BestChoiceHome />
           </View>
+
+          <View style={styles.todaySpecialCont}>
+            <View style={styles.todaySpecialTopCont}>
+              <Text style={styles.commonTxt}>Today Special</Text>
+              <View style={styles.viewAllCont}>
+                <Text style={styles.viewAllTxt}>View All</Text>
+                <AntDesign name="arrowright" size={19} color={colors.green} />
+              </View>
+            </View>
+
+            <TodaySpecial/>
+          </View>
+
+        
         </View>
-        <FlatList
-          contentContainerStyle={styles.flatListHomeStyle}
-          horizontal
-          data={foodHomeImages}
-          renderItem={({item}) => (
-            <Image style={styles.foodImg} source={item.image} />
-          )}
-          showsHorizontalScrollIndicator={false}
-        />
-        <HomeCarousal />
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -70,7 +95,7 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: responsiveWidth(3),
+    // paddingLeft: responsiveWidth(3),
     paddingTop: Platform.OS === 'ios' ? 60 : responsiveHeight(6),
     backgroundColor: colors.white,
   },
@@ -79,8 +104,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-    paddingRight: responsiveWidth(7),
+    paddingRight: responsiveWidth(4),
     alignItems: 'center',
+    marginHorizontal: responsiveWidth(3.5),
   },
 
   imgTextContainer: {
@@ -158,7 +184,7 @@ const styles = StyleSheet.create({
   },
 
   flatListHomeStyle: {
-    paddingRight: 10,
+    paddingHorizontal: responsiveWidth(3.8),
     flexDirection: 'row',
     gap: responsiveWidth(3),
   },
@@ -167,6 +193,50 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     width: 153,
     height: 65,
+  },
+
+  bestChoiceContainer: {
+    gap: 10,
+    marginTop: 10,
+    // marginBottom: 10,
+    // paddingHorizontal: responsiveWidth(3.8),
+  },
+
+  commonTxt: {
+    fontSize: responsiveFontSize(3.0),
+    fontWeight: '700',
+    color: colors.black,
+    lineHeight: 40,
+    fontFamily: fonts.bai.semiBold,
+    paddingLeft: responsiveWidth(3.8),
+  },
+
+  todaySpecialCont: {
+    // paddingHorizontal: responsiveWidth(3.8),
+    gap: 20,
+    marginTop: 40,
+  },
+
+  todaySpecialTopCont: {
+    // paddingHorizontal: responsiveWidth(3.0),
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingRight: responsiveWidth(3)
+  },
+
+  viewAllCont: {
+    flexDirection: 'row',
+    gap: 4,
+    alignItems: 'center',
+  },
+
+  viewAllTxt: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.black,
+    lineHeight: 31,
+    fontFamily: fonts.bai.semiBold,
   },
 });
 
