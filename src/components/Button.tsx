@@ -34,7 +34,7 @@ export default class CustomButton extends Component<ButtonProps> {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 375,
+    width: 385,
     height: 75,
     alignSelf: 'center',
     borderRadius: 60,

@@ -5,15 +5,15 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
-  ListRenderItem,
   ImageSourcePropType,
-  Platform
+  Platform,
 } from 'react-native';
-import {dishImg, todaySpecialImg} from '../assets';
+import {restaurantNearByImg, todaySpecialImg} from '../assets';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
-import { responsiveWidth } from 'react-native-responsive-dimensions';
+import {responsiveHeight, responsiveWidth} from 'react-native-responsive-dimensions';
+import RatingComponent from './RatingComponent';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 interface FoodItem {
   id: string;
@@ -22,11 +22,6 @@ interface FoodItem {
   originalPrice: string;
   restaurant: string;
   image: ImageSourcePropType;
-}
-
-interface TodaySpecialProps {}
-interface TodaySpecialState {
-  data: FoodItem[];
 }
 
 const foodData: FoodItem[] = [
@@ -72,35 +67,45 @@ const foodData: FoodItem[] = [
   },
 ];
 
-class TodaySpecial extends React.Component<
-  TodaySpecialProps,
-  TodaySpecialState
+interface RestaurantNearByProps {}
+interface RestaurantNearByState {
+  data: FoodItem[];
+}
+
+class RestaurantNearBy extends React.Component<
+  RestaurantNearByProps,
+  RestaurantNearByState
 > {
-  constructor(props: TodaySpecialProps) {
+  constructor(props: RestaurantNearByProps) {
     super(props);
     this.state = {
       data: foodData,
     };
   }
 
-  renderItem: ListRenderItem<FoodItem> = ({item}) => (
-    <View style={styles.card}>
-      <View style={styles.imgCont}>
-        <Image source={item.image} style={styles.image} />
-      </View>
-      <View style={styles.details}>
-        <Text style={styles.name}>{item.name}</Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>{item.price}</Text>
-          <Text style={styles.originalPrice}>{item.originalPrice}</Text>
+  renderItem = (item: any) => {
+    console.log(item, 'items');
+    return (
+      <View style={styles.card}>
+        <View style={styles.imgCont}>
+          <Image source={restaurantNearByImg} style={styles.image} />
         </View>
-        <View style={styles.imgTxtCont}>
-          <Image source={dishImg} style={styles.imgStyle} />
-          <Text style={styles.restaurant}>{item.restaurant}</Text>
+        <View style={styles.details}>
+          <Text style={styles.name}>Golden Fish Restaurant</Text>
+          <View style={styles.kmsRatingCont}>
+            <View style={styles.kmsCont}>
+              <Entypo name="location-pin" size={16} color={colors.red} />
+              <Text style={styles.price}>2.5km</Text>
+            </View>
+            <RatingComponent ratingNum={3} />
+          </View>
+          <Text style={styles.address}>
+            Manish Nagar, Ingole Nagar, Sonegaon, Nagpur
+          </Text>
         </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   render() {
     const {data} = this.state;
@@ -108,65 +113,75 @@ class TodaySpecial extends React.Component<
     return (
       <FlatList
         data={data}
-        keyExtractor={item => item.id}
-        renderItem={this.renderItem}
-        showsVerticalScrollIndicator={false}
+        renderItem={({item}) => this.renderItem(item)}
+        keyExtractor={(_, index) => index.toString()}
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.flatList}
-        nestedScrollEnabled
+        horizontal
       />
     );
   }
 }
 
-export default TodaySpecial;
+export default RestaurantNearBy;
 
 const styles = StyleSheet.create({
   flatList: {
-    padding: responsiveWidth(4),
-    marginTop: -15,
+    paddingHorizontal: responsiveWidth(4),
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: responsiveHeight(1.7),
   },
   card: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 15,
     marginBottom: 10,
+    shadowColor: Platform.OS === 'ios' ? '#fff3e5' : '#000',
     shadowOffset: {width: 2, height: 2},
     shadowOpacity: 3,
     shadowRadius: 15,
     elevation: 8,
-    shadowColor: Platform.OS === 'ios' ? '#fff3e5' : '#000',
+    width: 296,
+    height: 289,
   },
   imgCont: {
-    width: 114,
-    height: 126,
-    overflow: 'hidden',
+    width: '100%',
+    height: 140,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
   details: {
-    // borderWidth: 2,
-    // borderColor: "#000",
     marginLeft: 10,
     justifyContent: 'center',
-    gap: 8,
+    gap: 5,
+    paddingTop: 8,
+    paddingLeft: 8,
   },
   name: {
-    fontSize: 17,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
     color: colors.black,
-    fontFamily: fonts.bai.medium,
+    fontFamily: fonts.bai.semiBold,
   },
-  priceContainer: {
+  kmsRatingCont: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 15,
+  },
+  kmsCont: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
   },
   price: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '600',
     color: colors.red,
     marginRight: 3,
     fontFamily: fonts.bai.medium,
@@ -176,21 +191,25 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     color: colors.red,
   },
-
   imgTxtCont: {
     flexDirection: 'row',
     gap: 5,
     alignItems: 'center',
   },
-
   imgStyle: {
     width: 24,
     height: 24,
   },
-
   restaurant: {
     fontSize: 15,
     color: colors.lightTextColor,
     fontFamily: fonts.bai.medium,
+  },
+  address: {
+    fontSize: 15,
+    color: colors.lightTextColor,
+    fontFamily: fonts.montserrat.medium,
+    lineHeight: 20,
+    fontWeight: '600',
   },
 });

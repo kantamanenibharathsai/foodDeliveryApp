@@ -1,3 +1,4 @@
+import { burgerImg } from './index';
 export const loginRedBg = require('./images/loginRed.png');
 export const loginFoodPlateBg = require('./images/foodPlate.png');
 export const phoneIcon = require('./images/phoneIcon.png');
@@ -26,11 +27,12 @@ export const questionMarkImg = require("../assets/images/QuestionMark.png");
 export const otpVerifiForgotPassBgImg = require("../assets/images/OtpVerificationForgotPassBg.png");
 export const userProfileImg = require("../assets/images/userProfile.png");
 export const pizzaImg = require("../assets/images/pizza.png");
-export const burgerImg = require("../assets/images/burger.png");
 export const chickenImg = require("../assets/images/chicken.png");
 export const homeCarouselImg = require("../assets/images/homeCarouselImg.png");
 export const bestChoiceBurgerImg = require("../assets/images/bestChoiceBurger.png");
 export const bestChoiceBellIconImg = require("../assets/images/bestChoiceBellIcon.png");
 export const plusIconImg = require("../assets/images/plusIcon.png");
 export const todaySpecialImg = require("../assets/images/TodaySpecialImg.png");
-export const dishImg = require("../assets/images/dish.png")
+export const dishImg = require("../assets/images/dish.png");
+export const restaurantNearByImg = require("../assets/images/restaurantNearByHome.png");
+export const burgerPizzaImg = require("../assets/images/burgerPizza.png");

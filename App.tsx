@@ -28,7 +28,7 @@ const App = () => {
       />
       <Stack.Navigator
         screenOptions={{headerShown: false}}
-        initialRouteName="HomeScreen">
+        initialRouteName="BottomTab">
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -53,7 +53,7 @@ const App = () => {
           name="SetNewPasscodeScreen"
           component={SetNewPasscodeScreen}
         />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        {/* <Stack.Screen name="HomeScreen" component={HomeScreen} /> */}
         <Stack.Screen name="BottomTab" component={BottomTabNavigation} />
       </Stack.Navigator>
     </NavigationContainer>

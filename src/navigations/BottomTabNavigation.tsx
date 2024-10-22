@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   labelActiveContainer: {
-    backgroundColor: colors.green,
+    backgroundColor: colors.red,
     flexDirection: 'row',
     gap: 10,
     alignItems: 'center',

@@ -24,12 +24,13 @@ import HomeCarousal from '../components/HomeCarousel';
 import BestChoiceHome from '../components/BestChoiceHome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import TodaySpecial from '../components/TodaySpecial';
+import RestaurantNearBy from '../components/RestaurantNearBy';
 
 class HomeScreen extends Component {
   render() {
     return (
       <ScrollView style={styles.container}>
-        <View>
+        <View style={styles.cont}>
           <View style={styles.profileContainer}>
             <View style={styles.imgTextContainer}>
               <View style={styles.imgCont}>
@@ -81,11 +82,18 @@ class HomeScreen extends Component {
                 <AntDesign name="arrowright" size={19} color={colors.green} />
               </View>
             </View>
-
-            <TodaySpecial/>
+            <TodaySpecial />
           </View>
-
-        
+          <View style={styles.todaySpecialCont}>
+            <View style={styles.todaySpecialTopCont}>
+              <Text style={styles.commonTxt}>Restaurant Nearby</Text>
+              <View style={styles.viewAllCont}>
+                <Text style={styles.viewAllTxt}>Map</Text>
+                <AntDesign name="arrowright" size={19} color={colors.green} />
+              </View>
+            </View>
+            <RestaurantNearBy />
+          </View>
         </View>
       </ScrollView>
     );
@@ -95,9 +103,11 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingLeft: responsiveWidth(3),
-    paddingTop: Platform.OS === 'ios' ? 60 : responsiveHeight(6),
     backgroundColor: colors.white,
+  },
+
+  cont: {
+    paddingTop: responsiveHeight(6)
   },
 
   profileContainer: {
@@ -187,6 +197,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(3.8),
     flexDirection: 'row',
     gap: responsiveWidth(3),
+    // borderWidth: 1,
+    // borderColor: colors.greyColor,
   },
 
   foodImg: {
@@ -214,7 +226,7 @@ const styles = StyleSheet.create({
   todaySpecialCont: {
     // paddingHorizontal: responsiveWidth(3.8),
     gap: 20,
-    marginTop: 40,
+    marginTop: 5,
   },
 
   todaySpecialTopCont: {
@@ -222,7 +234,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: responsiveWidth(3)
+    paddingRight: responsiveWidth(3),
   },
 
   viewAllCont: {
