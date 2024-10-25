@@ -98,4 +98,4 @@ export interface FoodHomeImageInterface {
   image: ImageSourcePropType;
 }
 
-export const foodHomeImages = [{ id: 1, image: pizzaImg }, { id: 2, image: burgerImg }, { id: 3, image: chickenImg }]
+export const foodHomeImages = [{ id: 1, image: pizzaImg }, { id: 2, image: pizzaImg }, { id: 3, image: chickenImg }]

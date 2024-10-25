@@ -13,8 +13,8 @@ import {
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
-import IonicIcons from "react-native-vector-icons/Ionicons"
-import { fonts } from '../constants/fonts';
+import IonicIcons from 'react-native-vector-icons/Ionicons';
+import {fonts} from '../constants/fonts';
 import TodaySpecial from '../components/TodaySpecial';
 import SearchScreenFood from '../components/SearchScreenFood';
 
@@ -33,7 +33,7 @@ class SearchScreen extends Component {
             <TextInput
               style={styles.input}
               placeholderTextColor={colors.lightTextColor}
-              placeholder='Search..'
+              placeholder="Search.."
               // value={values.email}
               // onChangeText={handleChange('email')}
               // onBlur={handleBlur('email')}
@@ -82,8 +82,6 @@ class SearchScreen extends Component {
 
 export default SearchScreen;
 
-
-
 const styles = StyleSheet.create({
   inputCont: {
     height: 68,
@@ -118,7 +116,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
     marginTop: -10,
-    rowGap: 0
+    rowGap: 0,
   },
 
   historyTxt: {

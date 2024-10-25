@@ -1,4 +1,4 @@
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import React, {Component, createRef} from 'react';
 import {
   Image,
@@ -24,7 +24,7 @@ type RootStackParamList = {
 };
 
 interface IProps {
-  navigation: NavigationProp<RootStackParamList>;
+  navigation: NavigationProp<ParamListBase>;
 }
 
 interface IState {

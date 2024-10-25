@@ -1,4 +1,4 @@
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import React, {Component} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {spalshScreen1, spalshScreen2} from '../assets';
@@ -17,7 +17,7 @@ type SplashScreenNavigationProp = NavigationProp<
 >;
 
 interface IProps {
-  navigation: NavigationProp<RootStackParamList>;
+  navigation: NavigationProp<ParamListBase>;
 }
 
 interface IState {

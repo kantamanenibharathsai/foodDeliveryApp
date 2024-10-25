@@ -14,7 +14,11 @@ import {dishImg, todaySpecialImg} from '../assets';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
-
+import {
+  NavigationProp,
+  RouteProp,
+  ParamListBase,
+} from '@react-navigation/native';
 interface FoodItem {
   id: string;
   name: string;
@@ -24,7 +28,16 @@ interface FoodItem {
   image: ImageSourcePropType;
 }
 
-interface TodaySpecialProps {}
+interface RootStackParamList extends ParamListBase {
+  auth: undefined;
+  home: undefined;
+  'terms-and-conditions': undefined;
+  'verify-otp': undefined;
+  'forgot-password': undefined;
+}
+
+interface TodaySpecialProps {
+}
 interface TodaySpecialState {
   data: FoodItem[];
 }
@@ -70,6 +83,30 @@ const foodData: FoodItem[] = [
     restaurant: 'Golden Fish Restaurant',
     image: todaySpecialImg,
   },
+  {
+    id: '6',
+    name: 'Bset Veg Dum Biryani',
+    price: '₹100',
+    originalPrice: '₹200',
+    restaurant: 'Golden Fish Restaurant',
+    image: todaySpecialImg,
+  },
+  {
+    id: '7',
+    name: 'Bset Veg Dum Biryani',
+    price: '₹100',
+    originalPrice: '₹200',
+    restaurant: 'Golden Fish Restaurant',
+    image: todaySpecialImg,
+  },
+  {
+    id: '8',
+    name: 'Bset Veg Dum Biryani',
+    price: '₹100',
+    originalPrice: '₹200',
+    restaurant: 'Golden Fish Restaurant',
+    image: todaySpecialImg,
+  },
 ];
 
 class TodaySpecial extends React.Component<
@@ -105,6 +142,7 @@ class TodaySpecial extends React.Component<
   render() {
     const {data} = this.state;
 
+
     return (
       <FlatList
         data={data}
@@ -122,8 +160,8 @@ export default TodaySpecial;
 
 const styles = StyleSheet.create({
   flatList: {
-    padding: responsiveWidth(4),
-    marginTop: -15,
+    // padding: responsiveWidth(4),
+    marginTop: -5,
   },
   card: {
     flexDirection: 'row',

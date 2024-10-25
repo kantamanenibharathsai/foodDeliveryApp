@@ -71,13 +71,12 @@ const foodData: FoodItem[] = [
 ];
 
 interface RestaurantNearByProps {
-  isRestNearByScreen: boolean;
 }
 interface RestaurantNearByState {
   data: FoodItem[];
 }
 
-class RestaurantNearBy extends React.Component<
+class RestaurantNearByScreenVertical extends React.Component<
   RestaurantNearByProps,
   RestaurantNearByState
 > {
@@ -89,7 +88,6 @@ class RestaurantNearBy extends React.Component<
   }
 
   renderItem = (item: any) => {
-    console.log(item, 'items');
     return (
       <View style={styles.card}>
         <View style={styles.imgCont}>
@@ -120,24 +118,23 @@ class RestaurantNearBy extends React.Component<
         data={data}
         renderItem={({item}) => this.renderItem(item)}
         keyExtractor={(_, index) => index.toString()}
-        showsHorizontalScrollIndicator={false}
+        // showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.flatList}
-        horizontal={true}
-        showsVerticalScrollIndicator={false}
-        
+        // horizontal={false}
+        // showsVerticalScrollIndicator={false}
       />
     );
   }
 }
 
-export default RestaurantNearBy;
+export default RestaurantNearByScreenVertical;
 
 const styles = StyleSheet.create({
   flatList: {
     paddingHorizontal: responsiveWidth(4),
-    flexDirection: 'row',
     gap: 16,
-    marginBottom: responsiveHeight(1.7),
+    marginVertical: responsiveHeight(1.7),
+    paddingBottom: responsiveHeight(4)
   },
   card: {
     backgroundColor: '#fff',
@@ -148,12 +145,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 3,
     shadowRadius: 15,
     elevation: 8,
-    width: 296,
-    height: 289,
+    // width: 296,
+    // height: 270,
   },
   imgCont: {
     width: '100%',
-    height: 140,
+    height: Platform.OS === 'ios' ? 140 : 160,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
@@ -166,8 +163,8 @@ const styles = StyleSheet.create({
   details: {
     marginLeft: 10,
     justifyContent: 'center',
-    gap: 5,
-    paddingTop: 8,
+    gap: Platform.OS === 'ios' ? 9 : responsiveHeight(0.3),
+    paddingVertical: Platform.OS === 'ios' ? 18 : responsiveHeight(2),
     paddingLeft: 8,
   },
   name: {
@@ -217,6 +214,5 @@ const styles = StyleSheet.create({
     color: colors.lightTextColor,
     fontFamily: fonts.montserrat.medium,
     lineHeight: 20,
-    fontWeight: '600',
   },
 });

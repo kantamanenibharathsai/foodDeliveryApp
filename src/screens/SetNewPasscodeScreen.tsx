@@ -17,7 +17,7 @@ import {OtpInput} from 'react-native-otp-entry';
 import CustomButton from '../components/Button';
 import KeyboardWrapper from '../components/KeyboardWrapper';
 
-// Type definitions for props and state
+
 interface Props {}
 
 interface State {

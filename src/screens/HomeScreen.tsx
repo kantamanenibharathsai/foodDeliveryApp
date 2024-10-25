@@ -4,10 +4,9 @@ import {
   Text,
   StyleSheet,
   Image,
-  StatusBar,
-  Platform,
   FlatList,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {userProfileImg} from '../assets';
 import {fonts} from '../constants/fonts';
@@ -25,8 +24,20 @@ import BestChoiceHome from '../components/BestChoiceHome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import TodaySpecial from '../components/TodaySpecial';
 import RestaurantNearBy from '../components/RestaurantNearBy';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 
-class HomeScreen extends Component {
+interface Props {
+  navigation: NavigationProp<ParamListBase>;
+}
+class HomeScreen extends Component<Props> {
+  mapHandler = () => {
+    this.props.navigation.navigate('RestNearByScreen');
+  };
+
+  viewAllHandler = () => {
+    this.props.navigation.navigate('TodaySpecialScreen');
+  };
+
   render() {
     return (
       <ScrollView style={styles.container}>
@@ -77,24 +88,30 @@ class HomeScreen extends Component {
           <View style={styles.todaySpecialCont}>
             <View style={styles.todaySpecialTopCont}>
               <Text style={styles.commonTxt}>Today Special</Text>
-              <View style={styles.viewAllCont}>
+              <TouchableOpacity
+                onPress={this.viewAllHandler}
+                style={styles.navigateBtn}>
                 <Text style={styles.viewAllTxt}>View All</Text>
                 <AntDesign name="arrowright" size={19} color={colors.green} />
-              </View>
+              </TouchableOpacity>
             </View>
             <TodaySpecial />
           </View>
           <View style={styles.todaySpecialCont}>
             <View style={styles.todaySpecialTopCont}>
               <Text style={styles.commonTxt}>Restaurant Nearby</Text>
-              <View style={styles.viewAllCont}>
-                <Text style={styles.viewAllTxt}>Map</Text>
-                <AntDesign name="arrowright" size={19} color={colors.green} />
-              </View>
+              <TouchableOpacity
+                onPress={this.mapHandler}
+                style={styles.navigateBtn}>
+                <View style={styles.viewAllCont}>
+                  <Text style={styles.viewAllTxt}>Map</Text>
+                  <AntDesign name="arrowright" size={19} color={colors.green} />
+                </View>
+              </TouchableOpacity>
             </View>
-            <RestaurantNearBy />
           </View>
         </View>
+        <RestaurantNearBy isRestNearByScreen={false} />
       </ScrollView>
     );
   }
@@ -107,7 +124,7 @@ const styles = StyleSheet.create({
   },
 
   cont: {
-    paddingTop: responsiveHeight(6)
+    paddingTop: responsiveHeight(6),
   },
 
   profileContainer: {
@@ -235,6 +252,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: responsiveWidth(3),
+    marginBottom: responsiveHeight(1.5),
   },
 
   viewAllCont: {
@@ -250,6 +268,8 @@ const styles = StyleSheet.create({
     lineHeight: 31,
     fontFamily: fonts.bai.semiBold,
   },
+
+  navigateBtn: {flexDirection: 'row', alignItems: 'center', gap: 10},
 });
 
 export default HomeScreen;
