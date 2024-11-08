@@ -147,3 +147,22 @@ export interface IResponse {
     };
     type?: string;
 }
+
+export interface FoodHomeImageInterface {
+    id: number;
+    image: ImageSourcePropType;
+}
+
+export interface ImagesState {
+    id: number;
+    image: ImageSourcePropType | undefined;
+    continueBtn: ImageSourcePropType | undefined;
+    circleImg: ImageSourcePropType | undefined;
+    title: string;
+    description: string;
+}
+
+export interface StatesInterface {
+    id: number;
+    name: string;
+}

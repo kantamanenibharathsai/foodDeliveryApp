@@ -1,14 +1,7 @@
-import { ImageSourcePropType } from "react-native";
-import { burgerImg, chickenImg, pizzaImg } from "../assets";
+import { bestChoiceBurgerImg, chickenImg, pizzaCategoryImg, pizzaImg, burgerCategoryImg, chickenCategoryImg, vegRollCategoryImg, vegImg, drinkCategoryImg } from "../assets";
+import { StatesInterface } from "../config/Interface";
 
-export interface ImagesState {
-  id: number;
-  image: ImageSourcePropType | undefined;
-  continueBtn: ImageSourcePropType | undefined;
-  circleImg: ImageSourcePropType | undefined;
-  title: string;
-  description: string;
-}
+
 export const onBoardingImagesData = [
   {
     id: 1,
@@ -49,11 +42,6 @@ export const onBoardingImagesData = [
 ];
 
 
-export interface StatesInterface {
-  id: number;
-  name: string;
-}
-
 export const statesData: StatesInterface[] = [
   { "id": 1, "name": "Andhra Pradesh" },
   { "id": 2, "name": "Arunachal Pradesh" },
@@ -93,9 +81,29 @@ export const statesData: StatesInterface[] = [
   { "id": 36, "name": "Jammu and Kashmir" }
 ]
 
-export interface FoodHomeImageInterface {
-  id: number;
-  image: ImageSourcePropType;
-}
+
+export const countries = [
+  'India',
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Australia',
+  'Germany',
+  'France',
+  'Japan',
+];
+
+export const BestChoiceHomeImgs = [
+  { id: '1', foodName: 'Burger', price: 90, image: bestChoiceBurgerImg },
+  { id: '2', foodName: 'Pizza', price: 120, image: bestChoiceBurgerImg },
+  { id: '3', foodName: 'Pasta', price: 150, image: bestChoiceBurgerImg },
+  { id: '4', foodName: 'Sandwich', price: 80, image: bestChoiceBurgerImg },
+  { id: '5', foodName: 'Fries', price: 50, image: bestChoiceBurgerImg },
+];
+
 
 export const foodHomeImages = [{ id: 1, image: pizzaImg }, { id: 2, image: pizzaImg }, { id: 3, image: chickenImg }]
+
+export const categoryImages = [{ id: 1, image: pizzaCategoryImg }, { id: 2, image: burgerCategoryImg }, { id: 3, image: chickenCategoryImg }, { id: 4, image: vegRollCategoryImg }, { id: 5, image: drinkCategoryImg }, { id: 6, image: vegImg }]
+
+export const foodImages = [{ id: 1, image: pizzaImg }, { id: 2, image: pizzaImg }, { id: 3, image: chickenImg }]  

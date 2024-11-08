@@ -1,19 +1,13 @@
 import {Component} from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
-import {bestChoiceBellIconImg, bestChoiceBurgerImg, plusIconImg} from '../assets';
+import {bestChoiceBellIconImg, bestChoiceBurgerImg,} from '../assets';
 import {fonts} from '../constants/fonts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {colors} from '../utils/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { BestChoiceHomeImgs } from '../utils/Data';
 
-const DATA = [
-  {id: '1', foodName: 'Burger', price: 90, image: bestChoiceBurgerImg},
-  {id: '2', foodName: 'Pizza', price: 120, image: bestChoiceBurgerImg},
-  {id: '3', foodName: 'Pasta', price: 150, image: bestChoiceBurgerImg},
-  {id: '4', foodName: 'Sandwich', price: 80, image: bestChoiceBurgerImg},
-  {id: '5', foodName: 'Fries', price: 50, image: bestChoiceBurgerImg},
-];
 
 class BestChoiceHome extends Component {
 
@@ -25,13 +19,12 @@ class BestChoiceHome extends Component {
         <Image
           source={bestChoiceBurgerImg}
           style={styles.bestChoiceFoodImg}
-          // resizeMode="contain"
         />
       </View>
       <View style={styles.bodyCont}>
         <Text style={styles.bestChoiceFoodText}>Burger</Text>
         <View style={styles.rupeeCont}>
-          <FontAwesome name="rupee" style={styles.rupeeIcon} color={colors.red} size={15} />
+          <FontAwesome name="rupee" color={colors.red} size={15} />
           <Text style={styles.price}>90</Text>
         </View>
 
@@ -40,7 +33,6 @@ class BestChoiceHome extends Component {
       </View>
       <View style={styles.whiteCircle}>
         <AntDesign name="plus" size={25} />
-        {/* <Image source={plusIconImg} style={styles.plusIcon} /> */}
       </View>
     </View>
   )};
@@ -48,7 +40,7 @@ class BestChoiceHome extends Component {
   render() {
     return (
       <FlatList
-        data={DATA}
+        data={BestChoiceHomeImgs}
         renderItem={this.renderItem}
         keyExtractor={item => item.id.toString()}
         horizontal
@@ -63,11 +55,8 @@ export default BestChoiceHome;
 
 const styles = StyleSheet.create({
   flatList: {
-    // alignItems: 'center',
-    // flexDirection: 'row',
     gap: 20,
     paddingHorizontal: responsiveWidth(3.8),
-    // flex: 1,
   },
 
   bestChoiceHomeCont: {
@@ -81,7 +70,6 @@ const styles = StyleSheet.create({
     paddingVertical: responsiveHeight(3.2),
     marginVertical: responsiveHeight(4),
     justifyContent: 'space-between',
-    // paddingHorizontal: responsiveWidth(1.2),
   },
 
   bestChoiceFoodImgCont: {
@@ -117,8 +105,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-
-  rupeeIcon: {},
 
   price: {
     color: '#FF5722',

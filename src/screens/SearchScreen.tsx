@@ -123,6 +123,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.montserrat.medium,
     color: colors.lightTextColor,
     fontSize: responsiveFontSize(1.5),
-    // lineHeight: 20
   },
 });

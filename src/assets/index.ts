@@ -1,5 +1,3 @@
-import { burgerFlatlistImg, burgerFlatListImg } from './index';
-
 export const loginRedBg = require('./images/loginRed.png');
 export const loginFoodPlateBg = require('./images/foodPlate.png');
 export const phoneIcon = require('./images/phoneIcon.png');
@@ -49,6 +47,17 @@ export const tickImg = require("../assets/images/tick.png");
 export const shoppingBagImg = require("../assets/images/shoppingBag.png");
 export const editProfileImg = require("../assets/images/editProfileImg.png");
 export const favoriteImg = require("../assets/images/favoriteImg.png");
-
-
-
+export const galleryImg = require("../assets/images/galleryImg.png");
+export const reviewsUserImg = require("../assets/images/reviewsUserImg.png");
+export const reviewCardImg = require("../assets/images/reviewCardImg.png");
+export const reviewCardScaleImg = require("../assets/images/reviewScaleImg.png");
+export const cameraImg = require("../assets/images/cameraImg.png");
+export const emailIconImg = require("../assets/images/emailIcon.png");
+export const pizzaCategoryImg = require("../assets/images/pizzaImg.png");
+export const burgerCategoryImg = require("../assets/images/burgerImg.png");
+export const chickenCategoryImg = require("../assets/images/chickenImg.png");
+export const vegRollCategoryImg = require("../assets/images/vegRollImg.png");
+export const drinkCategoryImg = require("../assets/images/drinkImg.png");
+export const vegImg = require("../assets/images/vegImg.png");
+export const hamburgerCheeseBurgerSushiBaconBurgerPizzaImg = require("../assets/images/hamburgerCheeseBurgerSushiBaconBurgerPizza.png");
+export const burgerCategory2Img = require("../assets/images/burgerCategoryImg.png");

@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
     height: 98,
+    
   },
 
   cartText: {

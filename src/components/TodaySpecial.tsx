@@ -19,7 +19,7 @@ import {
   RouteProp,
   ParamListBase,
 } from '@react-navigation/native';
-interface FoodItem {
+export interface FoodItem {
   id: string;
   name: string;
   price: string;
@@ -42,7 +42,7 @@ interface TodaySpecialState {
   data: FoodItem[];
 }
 
-const foodData: FoodItem[] = [
+export const foodData: FoodItem[] = [
   {
     id: '1',
     name: 'Bset Veg Dum Biryani',

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,7 +7,7 @@ import {
   Platform,
   FlatList,
   Image,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {colors} from '../utils/Colors';
@@ -21,11 +21,11 @@ import {
 } from 'react-native-responsive-dimensions';
 import RatingComponent from '../components/RatingComponent';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { foodHomeImages } from '../utils/Data';
+import {foodHomeImages} from '../utils/Data';
 import BestChoiceHome from '../components/BestChoiceHome';
 import TodaySpecial from '../components/TodaySpecial';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
-
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import { galleryImg } from '../assets';
 
 interface Person {
   id: string;
@@ -49,13 +49,44 @@ const teamData: Person[] = [
     image:
       'https://s3-alpha-sig.figma.com/img/7426/7aa9/ebaab2639afb8cfcadd5f9cbcca5358c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=AOzCuF-RF7pd8CS3T0n669M3sLVWi6dV7beEqzpEZm6VWJ5XXTfxIUybpfQVI4-2CzDjgaNivytDwfuLubTUEqerZVw677qlXgY1BHhQ9pO0GvOLqd7y8S4xAjuJDPjldg2pL2-c~X6zen-GKNNLSrxg3aiNvU7MFmNSXcdhBn1LZqm76wx3~6nqHYVZOf8KI3PFnoE2bq1-DxjmUZ8GzeEQeKmrX04GP2vEps2GqyYQoKyPF4IHFmP~mP-WaPMZXg0-mBqRXI6-JLym4SKrjoBySAYpgNC2~hMlbTT5LQvY6HO7EFPDXxKiv2LZRFnXilnGzoDx956wrkR8sh92nA__',
   },
+  {
+    id: '3',
+    name: 'Mohan Lal',
+    role: 'Chef',
+    image:
+      'https://s3-alpha-sig.figma.com/img/7426/7aa9/ebaab2639afb8cfcadd5f9cbcca5358c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=AOzCuF-RF7pd8CS3T0n669M3sLVWi6dV7beEqzpEZm6VWJ5XXTfxIUybpfQVI4-2CzDjgaNivytDwfuLubTUEqerZVw677qlXgY1BHhQ9pO0GvOLqd7y8S4xAjuJDPjldg2pL2-c~X6zen-GKNNLSrxg3aiNvU7MFmNSXcdhBn1LZqm76wx3~6nqHYVZOf8KI3PFnoE2bq1-DxjmUZ8GzeEQeKmrX04GP2vEps2GqyYQoKyPF4IHFmP~mP-WaPMZXg0-mBqRXI6-JLym4SKrjoBySAYpgNC2~hMlbTT5LQvY6HO7EFPDXxKiv2LZRFnXilnGzoDx956wrkR8sh92nA__',
+  },
+  {
+    id: '4',
+    name: 'Mohan Lal',
+    role: 'Chef',
+    image:
+      'https://s3-alpha-sig.figma.com/img/7426/7aa9/ebaab2639afb8cfcadd5f9cbcca5358c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=AOzCuF-RF7pd8CS3T0n669M3sLVWi6dV7beEqzpEZm6VWJ5XXTfxIUybpfQVI4-2CzDjgaNivytDwfuLubTUEqerZVw677qlXgY1BHhQ9pO0GvOLqd7y8S4xAjuJDPjldg2pL2-c~X6zen-GKNNLSrxg3aiNvU7MFmNSXcdhBn1LZqm76wx3~6nqHYVZOf8KI3PFnoE2bq1-DxjmUZ8GzeEQeKmrX04GP2vEps2GqyYQoKyPF4IHFmP~mP-WaPMZXg0-mBqRXI6-JLym4SKrjoBySAYpgNC2~hMlbTT5LQvY6HO7EFPDXxKiv2LZRFnXilnGzoDx956wrkR8sh92nA__',
+  },
+  {
+    id: '5',
+    name: 'Mohan Lal',
+    role: 'Chef',
+    image:
+      'https://s3-alpha-sig.figma.com/img/7426/7aa9/ebaab2639afb8cfcadd5f9cbcca5358c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=AOzCuF-RF7pd8CS3T0n669M3sLVWi6dV7beEqzpEZm6VWJ5XXTfxIUybpfQVI4-2CzDjgaNivytDwfuLubTUEqerZVw677qlXgY1BHhQ9pO0GvOLqd7y8S4xAjuJDPjldg2pL2-c~X6zen-GKNNLSrxg3aiNvU7MFmNSXcdhBn1LZqm76wx3~6nqHYVZOf8KI3PFnoE2bq1-DxjmUZ8GzeEQeKmrX04GP2vEps2GqyYQoKyPF4IHFmP~mP-WaPMZXg0-mBqRXI6-JLym4SKrjoBySAYpgNC2~hMlbTT5LQvY6HO7EFPDXxKiv2LZRFnXilnGzoDx956wrkR8sh92nA__',
+  },
+  {
+    id: '6',
+    name: 'Mohan Lal',
+    role: 'Chef',
+    image:
+      'https://s3-alpha-sig.figma.com/img/7426/7aa9/ebaab2639afb8cfcadd5f9cbcca5358c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=AOzCuF-RF7pd8CS3T0n669M3sLVWi6dV7beEqzpEZm6VWJ5XXTfxIUybpfQVI4-2CzDjgaNivytDwfuLubTUEqerZVw677qlXgY1BHhQ9pO0GvOLqd7y8S4xAjuJDPjldg2pL2-c~X6zen-GKNNLSrxg3aiNvU7MFmNSXcdhBn1LZqm76wx3~6nqHYVZOf8KI3PFnoE2bq1-DxjmUZ8GzeEQeKmrX04GP2vEps2GqyYQoKyPF4IHFmP~mP-WaPMZXg0-mBqRXI6-JLym4SKrjoBySAYpgNC2~hMlbTT5LQvY6HO7EFPDXxKiv2LZRFnXilnGzoDx956wrkR8sh92nA__',
+  },
 ];
-
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
 }
 class NearByRestaurantBigScreen extends Component<Props> {
+  handleGoBack = () => {
+    this.props.navigation.goBack();
+  };
+
   mapHandler = () => {
     this.props.navigation.navigate('RestNearByScreen');
   };
@@ -66,9 +97,13 @@ class NearByRestaurantBigScreen extends Component<Props> {
 
   renderItem = ({item}: {item: Person}) => (
     <View style={styles.card}>
-      <Image source={{uri: item.image}} style={styles.image} />
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.role}>{item.role}</Text>
+      <View style={styles.imageCont}>
+        <Image source={{uri: item.image}} style={styles.image} />
+      </View>
+      <View style={styles.cardTxtCont}>
+        <Text style={styles.cardName}>{item.name}</Text>
+        <Text style={styles.role}>{item.role}</Text>
+      </View>
     </View>
   );
   render() {
@@ -77,7 +112,7 @@ class NearByRestaurantBigScreen extends Component<Props> {
         <View style={styles.nearbyResHeader}>
           <TouchableOpacity onPress={this.handleGoBack} style={styles.leftIcon}>
             <Entypo name="chevron-small-left" size={30} color={colors.black} />
-          </TouchableOpacity>
+          </TouchableOpacity> 
           <Text style={styles.nearByResText}>Nearby Restaurant</Text>
         </View>
         <View style={styles.bodyCont}>
@@ -140,11 +175,43 @@ class NearByRestaurantBigScreen extends Component<Props> {
             <Text style={styles.name}>Team</Text>
             <FlatList
               data={teamData}
-              renderItem={renderItem}
+              renderItem={this.renderItem}
               keyExtractor={item => item.id}
               horizontal
               contentContainerStyle={styles.list}
+              showsHorizontalScrollIndicator={false}
             />
+          </View>
+
+          <View style={styles.categoryCont}>
+            <Text style={styles.name}>Gallery</Text>
+            <FlatList
+              data={teamData}
+              numColumns={2}
+              renderItem={({item}) => {
+                return (
+                  <View
+                    style={{
+                      marginRight: responsiveWidth(4.5),
+                      width: responsiveWidth(41),
+                      height: responsiveWidth(25),
+                    }}>
+                    <Image
+                      source={galleryImg}
+                      style={{width: '100%', height: '100%', borderRadius: 6}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={item => item.id}
+              // horizontal
+              contentContainerStyle={styles.galleryList}
+              // showsHorizontalScrollIndicator={false}
+            />
+          </View>
+
+          <View style={styles.phoneImageCont}>
+            <Entypo name="phone" color={colors.white} size={30}/>
           </View>
         </View>
       </ScrollView>
@@ -153,7 +220,6 @@ class NearByRestaurantBigScreen extends Component<Props> {
 }
 
 export default NearByRestaurantBigScreen;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -184,6 +250,7 @@ const styles = StyleSheet.create({
   },
   bodyCont: {
     flex: 1,
+    paddingBottom: 13,
   },
   details: {
     marginLeft: 10,
@@ -194,7 +261,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 20,
-    fontWeight: '600',
     color: colors.black,
     fontFamily: fonts.bai.semiBold,
   },
@@ -243,7 +309,6 @@ const styles = StyleSheet.create({
 
   btnsCont: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
     gap: 10,
@@ -251,7 +316,6 @@ const styles = StyleSheet.create({
   },
 
   favoriteBtn: {
-    // width: 170,
     height: 60,
     borderRadius: 8,
     backgroundColor: colors.red,
@@ -281,18 +345,13 @@ const styles = StyleSheet.create({
   categoryCont: {
     flexDirection: 'column',
     gap: 10,
-    // borderWidth: 2,
-    // borderColor: "#000",
     paddingLeft: responsiveWidth(4),
     marginTop: 15,
   },
 
   flatListHomeStyle: {
-    // paddingHorizontal: responsiveWidth(2.5),
     flexDirection: 'row',
     gap: responsiveWidth(3),
-    // borderWidth: 1,
-    // borderColor: colors.greyColor,
   },
 
   foodImg: {
@@ -308,10 +367,8 @@ const styles = StyleSheet.create({
   },
 
   todaySpecialTopCont: {
-    // paddingHorizontal: responsiveWidth(3.0),
     justifyContent: 'space-between',
     flexDirection: 'row',
-    alignItems: 'center',
     paddingRight: responsiveWidth(3),
     marginBottom: responsiveHeight(1.5),
   },
@@ -340,4 +397,83 @@ const styles = StyleSheet.create({
   },
 
   navigateBtn: {flexDirection: 'row', alignItems: 'center', gap: 10},
+
+  list: {
+    gap: 15,
+    paddingRight: responsiveWidth(3.5),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  card: {
+    width: 165,
+    height: 135,
+    borderRadius: 20,
+    backgroundColor: '#FFF3E5',
+    position: 'relative',
+    top: 35,
+    alignItems: 'center',
+    padding: responsiveHeight(1.25),
+    paddingVertical: responsiveHeight(3.2),
+    marginBottom: responsiveHeight(4),
+    justifyContent: 'space-between',
+  },
+
+  cardTxtCont: {
+    position: 'relative',
+    top: 30,
+    textAlign: 'center',
+    zIndex: 10,
+  },
+
+  cardName: {
+    fontSize: responsiveFontSize(2.1),
+    color: colors.black,
+    fontFamily: fonts.bai.semiBold,
+    textAlign: 'center',
+  },
+
+  imageCont: {
+    width: 90,
+    height: 90,
+    borderWidth: 5,
+    borderColor: '#fff',
+    borderRadius: 100,
+    position: 'absolute',
+    top: -40,
+    left: 36,
+  },
+
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 100,
+    resizeMode: 'cover',
+  },
+
+  role: {
+    fontSize: 15,
+    color: colors.red,
+    fontFamily: fonts.bai.medium,
+    textAlign: 'center',
+    marginTop: -5,
+  },
+
+  galleryList: {
+    gap: responsiveWidth(4.5),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  phoneImageCont: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    height: 60,
+    width: 60,
+    backgroundColor: colors.green,
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

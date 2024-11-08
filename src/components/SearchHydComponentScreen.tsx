@@ -18,7 +18,7 @@ import {
 import RatingComponent from './RatingComponent';
 import Entypo from 'react-native-vector-icons/Entypo';
 
-interface FoodItem {
+export interface FoodItem {
   id: string;
   name: string;
   price: string;
@@ -27,7 +27,7 @@ interface FoodItem {
   image: ImageSourcePropType;
 }
 
-const foodData: FoodItem[] = [
+export const foodData: FoodItem[] = [
   {
     id: '1',
     name: 'Bset Veg Dum Biryani',
