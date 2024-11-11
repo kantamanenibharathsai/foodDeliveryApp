@@ -172,7 +172,9 @@ class EditProfileScreen extends React.Component<Props, EditProfileScreenState> {
                     resourcePath.assets &&
                     resourcePath.assets[0]?.uri
                       ? {uri: resourcePath.assets[0].uri}
-                      :  {uri: 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=600'}
+                      : {
+                          uri: 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=600',
+                        }
                   }
                   resizeMode="cover"
                   style={styles.profileImg}

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import { otpEmailImg, personImg, registerTopImg} from '../assets';
+import { emailIconImg, otpEmailImg, personImg, registerTopImg} from '../assets';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
@@ -22,6 +22,9 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {statesData} from '../utils/Data';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import CustomButton from '../components/Button';
+import { AppDispatch, RootState } from '../redux/store';
+import { connect } from 'react-redux';
+
 
 interface RegisterFormValues {
   name: string;
@@ -35,8 +38,18 @@ interface RegisterFormValues {
 
 const RegisterValidationSchema = Yup.object().shape({
   name: Yup.string()
-    .matches(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
-    .required('*Name is required'),
+    .matches(
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};:'",.<>/?|\\~`]+$/,
+      'Username can contain letters, numbers and special characters',
+    )
+    .required('*Username is required')
+    .test('no-spaces', 'Username cannot contain spaces', value => {
+      if (!value) return true;
+      return !value.includes(' ');
+    })
+    .min(3, 'Username must be at least 3 characters')
+    .max(30, 'Username must be less than 30 characters')
+    .trim(),
   phone: Yup.string()
     .matches(/^\d{10}$/, '*Phone number must be 10 digits')
     .required('*Phone number is required'),
@@ -82,7 +95,7 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
 
   render() {
     return (
-      <ScrollView style={{flex: 1}}>
+      <ScrollView style={styles.scrollView}>
         <Formik<RegisterFormValues>
           initialValues={{
             name: '',
@@ -124,7 +137,9 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                     style={styles.input}
                     placeholderTextColor={colors.black}
                     value={values.name}
-                    onChangeText={handleChange('name')}
+                    onChangeText={text =>
+                      handleChange('name')(text.replace(/\s/g, ''))
+                    }
                     onBlur={handleBlur('name')}
                   />
                   <Image style={styles.icon} source={personImg} />
@@ -151,7 +166,7 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                     onChangeText={handleChange('email')}
                     onBlur={handleBlur('email')}
                   />
-                  <Image style={styles.icon} source={otpEmailImg} />
+                  <Image style={styles.icon} source={emailIconImg} />
                   {!this.state.emailFocused && values.email === '' && (
                     <Text style={styles.placeholder}>Email Id</Text>
                   )}
@@ -202,7 +217,7 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                     value: state.name,
                   }))}
                   search
-                  maxHeight={200}
+                  minHeight={200}
                   labelField="label"
                   valueField="value"
                   placeholder="State"
@@ -229,7 +244,9 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                   <Text style={styles.termsText}>Agree Terms & Conditions</Text>
                 </View>
                 {touched.termsAccepted && errors.termsAccepted && (
-                  <Text style={styles.errorText}>{errors.termsAccepted}</Text>
+                  <Text style={[styles.errorText, {marginTop: -20}]}>
+                    {errors.termsAccepted}
+                  </Text>
                 )}
                 <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
               </View>
@@ -241,14 +258,26 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
   }
 }
 
-export default RegisterScreen;
+const mapStateToProps = (state: RootState) => ({
+  email: state.auth.email,
+  apiStatus: state.auth.apiStatus,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  // sendOtp: (email: string) => dispatch(sendingOtp(email)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
 
 
 
 const styles = StyleSheet.create({
+  scrollView: {flex: 1, backgroundColor: "#fff"},
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    minHeight: '100%',
   },
   topImg: {
     height: responsiveHeight(20),
@@ -274,6 +303,7 @@ const styles = StyleSheet.create({
   },
   paddingContainer: {
     padding: 20,
+    flex: 1,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -409,6 +439,7 @@ const styles = StyleSheet.create({
     width: 370,
     alignSelf: 'center',
     marginTop: 20,
+    marginBottom: 20,
   },
 
   checkbox: {

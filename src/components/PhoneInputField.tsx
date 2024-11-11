@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import {CountryPicker} from 'react-native-country-codes-picker';
 import {downArrowIcon, phoneIcon} from '../assets';
-import { fonts } from '../constants/fonts';
-import { colors } from '../utils/Colors';
+import {fonts} from '../constants/fonts';
+import {colors} from '../utils/Colors';
 
 interface PhoneInputFieldProps {
   onChangePhone: (phone: string) => void;
@@ -70,11 +70,10 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
             <Text style={styles.codeText}>{selectedCountryCode}</Text>
             <Image source={downArrowIcon} style={styles.arrowIcon} />
           </TouchableOpacity>
-
           <TextInput
             style={[styles.input, styles.commonText]}
             placeholder="Mobile No"
-            placeholderTextColor="transparent" // Hiding default placeholder
+            placeholderTextColor="transparent"
             value={value}
             onChangeText={text => {
               onChangePhone(text);
@@ -82,8 +81,8 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
             }}
             onBlur={onBlur}
             keyboardType="phone-pad"
+            maxLength={10}
           />
-
           {placeholderVisible && (
             <Text style={styles.placeholderText}>Mobile No</Text>
           )}
@@ -93,7 +92,6 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
         {touched.phone && errors.phone && (
           <Text style={styles.errorText}>{errors.phone}</Text>
         )}
-
         <CountryPicker
           show={showPicker}
           onBackdropPress={() => this.setState({showPicker: false})}
