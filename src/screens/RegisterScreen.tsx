@@ -11,20 +11,26 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import { emailIconImg, otpEmailImg, personImg, registerTopImg} from '../assets';
+import {emailIconImg, otpEmailImg, personImg, registerTopImg} from '../assets';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
-import {responsiveHeight} from 'react-native-responsive-dimensions';
+import {
+  responsiveFontSize,
+  responsiveHeight,
+} from 'react-native-responsive-dimensions';
 import PhoneInputField from '../components/PhoneInputField';
 import {OtpInput} from 'react-native-otp-entry';
 import {Dropdown} from 'react-native-element-dropdown';
 import {statesData} from '../utils/Data';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import CustomButton from '../components/Button';
-import { AppDispatch, RootState } from '../redux/store';
-import { connect } from 'react-redux';
-
+import {AppDispatch, RootState} from '../redux/store';
+import {connect} from 'react-redux';
+import {
+  registerAction,
+  RegisterUserReqInterface,
+} from '../redux/slices/AuthSlice';
 
 interface RegisterFormValues {
   name: string;
@@ -78,12 +84,20 @@ interface RegisterScreenState {
   stateName: string;
 }
 
-class RegisterScreen extends Component<{}, RegisterScreenState> {
-  state: RegisterScreenState = {
-    nameFocused: false,
-    emailFocused: false,
-    stateName: '',
-  };
+interface RegisterScreenProps {
+  registerLoading: boolean;
+  registerMsg: string | null;
+  sendRegisterData: (data: RegisterUserReqInterface) => void;
+}
+
+class RegisterScreen extends Component<
+  RegisterScreenProps,
+  RegisterScreenState
+> {
+  constructor(props: RegisterScreenProps) {
+    super(props);
+    this.state = {nameFocused: false, emailFocused: false, stateName: ''};
+  }
 
   setValue = (value: string) => {
     this.setState({stateName: value});
@@ -107,7 +121,20 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
             stateName: '',
           }}
           validationSchema={RegisterValidationSchema}
-          onSubmit={values => console.log('Form Data:', values)}>
+          onSubmit={values => {
+            console.log('Form Data:', values);
+            const registerData = {
+              name: values.name,
+              mobile_no: values.phone,
+              email: values.email,
+              password: values.passcode,
+              country_code: '91',
+              state: values.stateName,
+              role: 'CUSTOMER',
+            };
+            console.log("registerData", registerData);
+            this.props.sendRegisterData(registerData);
+          }}>
           {({
             handleChange,
             handleBlur,
@@ -209,8 +236,11 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                   <Text style={styles.errorText}>{errors.confirmPasscode}</Text>
                 )}
                 <Dropdown
-                  value={this.state.stateName}
-                  onChange={item => this.setValue(item.value)}
+                  value={values.stateName} // Use Formik's state here
+                  onChange={item => {
+                    this.setValue(item.value); // Update component state (if needed)
+                    setFieldValue('stateName', item.value); // Update Formik's state
+                  }}
                   iconStyle={styles.iconStyle}
                   data={statesData.map(state => ({
                     label: state.name,
@@ -248,7 +278,18 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
                     {errors.termsAccepted}
                   </Text>
                 )}
-                <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
+                {this.props.registerLoading ? (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>Loading...</Text>
+                  </View>
+                ) : (
+                  <>
+                    <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
+                    <Text style={styles.registerMsgAPI}>
+                      {this.props.registerMsg}
+                    </Text>
+                  </>
+                )}
               </View>
             </View>
           )}
@@ -259,20 +300,19 @@ class RegisterScreen extends Component<{}, RegisterScreenState> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  email: state.auth.email,
-  apiStatus: state.auth.apiStatus,
+  registerMsg: state.auth.registerMessage,
+  registerLoading: state.auth.registerLoading,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
-  // sendOtp: (email: string) => dispatch(sendingOtp(email)),
+  sendRegisterData: (data: RegisterUserReqInterface) =>
+    dispatch(registerAction(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
 
-
-
 const styles = StyleSheet.create({
-  scrollView: {flex: 1, backgroundColor: "#fff"},
+  scrollView: {flex: 1, backgroundColor: '#fff'},
 
   container: {
     flex: 1,
@@ -474,4 +514,36 @@ const styles = StyleSheet.create({
     marginLeft: 0,
     marginTop: 4,
   },
+
+  loadingContainer: {
+    width: 385,
+    height: 75,
+    alignSelf: 'center',
+    borderRadius: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    marginVertical: 10,
+    shadowColor: '#94CD00',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
+    elevation: 12,
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontFamily: fonts.bai.black,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    fontSize: responsiveFontSize(2),
+  },
+
+  registerMsgAPI : {
+    color: colors.green,
+    fontSize: responsiveFontSize(2),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 3,
+  }
 });

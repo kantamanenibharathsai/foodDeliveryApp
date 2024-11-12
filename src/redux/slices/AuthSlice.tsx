@@ -223,7 +223,7 @@ interface VerifyPasswordPayload {
   otp: string;
 }
 export interface AuthDataType {
-  message: string | null;
+  registerMessage: string | null;
   loading: boolean;
   registerLoading: boolean;
   token: null | string;
@@ -244,7 +244,7 @@ export interface AuthDataType {
 }
 
 const initialState: AuthDataType = {
-  message: null,
+  registerMessage: null,
   loading: false,
   registerLoading: false,
   token: null,
@@ -309,22 +309,33 @@ export const registerAction = createAsyncThunk(
     payload: RegisterUserReqInterface,
     {rejectWithValue, fulfillWithValue},
   ) => {
-    // console.log(payload, 'signUp data');
+    console.log("payload", 'signUp data', payload);
     try {
       const options = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          name: 'bharathsai',
+          mobile_no: '8179041467',
+          email: 'kantamanenibh20@gmail.com',
+          password: '234564',
+          country_code: '91',
+          state: 'pradesh',
+          role: 'CUSTOMER',
+        }),
       };
-      const response = await fetch(baseURL + '/' + endPoints.SIGNUP, options);
+      const response = await fetch("http://192.168.1.10:8089" + '/' + endPoints.SIGNUP, options);
+      //192.168.1.15:8089/user/signUp
+      console.log("payload", payload);
       if (!response.ok) {
         const errorData = await response.json();
         // console.log(errorData, '=======>error signUp');
         return rejectWithValue(errorData.error.error);
       }
       const result = await response.json();
+      console.log("result", result);
       return fulfillWithValue(result);
     } catch (err) {
       console.log(err, '========>err signUp');
@@ -450,57 +461,56 @@ const Auth = createSlice({
     });
     builder.addCase(registerAction.pending, state => {
       state.registerLoading = true;
-      state.message = null;
+      state.registerMessage = null;
     });
     builder.addCase(registerAction.fulfilled, (state, action) => {
       state.registerLoading = false;
-      
-      state.message = action.payload.response.error.error;
+      state.registerMessage = action.payload.data.user;
       console.log(action.payload, 'resiter auth');
     });
     builder.addCase(registerAction.rejected, (state, action) => {
       state.registerLoading = false;
-      state.message = 'Please try again!';
+      state.registerMessage = 'Please try again!';
       console.log(action.payload, 'resiter error auth');
     });
-    builder.addCase(sendOTPaction.pending, state => {
-      state.loading = true;
-      state.message = null;
-    });
-    builder.addCase(sendOTPaction.fulfilled, (state, action) => {
-      state.loading = false;
-      console.log(action.payload.response.data.otp, 'thunk');
-      state.otp = action.payload.response.data.otp;
-      state.message = action.payload.response.data.message;
-    });
-    builder.addCase(sendOTPaction.rejected, (state, action) => {
-      state.loading = false;
-      state.message = 'Please try again!';
-    });
-    builder.addCase(verifyOtpAction.pending, state => {
-      state.loading = true;
-      state.message = null;
-    });
-    builder.addCase(verifyOtpAction.fulfilled, (state, action) => {
-      state.loading = false;
-    });
-    builder.addCase(verifyOtpAction.rejected, (state, action) => {
-      state.loading = false;
-      state.message = 'Please try again!';
-    });
-    builder.addCase(updatePasswordAction.pending, state => {
-      state.loading = true;
-      state.message = null;
-    });
-    builder.addCase(updatePasswordAction.fulfilled, (state, action) => {
-      state.loading = false;
-      console.log(action.payload, 'upPass action');
-      state.message = action.payload.data.message;
-    });
-    builder.addCase(updatePasswordAction.rejected, (state, action) => {
-      state.loading = false;
-      state.message = 'Please try again!';
-    });
+    // builder.addCase(sendOTPaction.pending, state => {
+    //   state.loading = true;
+    //   state.message = null;
+    // });
+    // builder.addCase(sendOTPaction.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   console.log(action.payload.response.data.otp, 'thunk');
+    //   state.otp = action.payload.response.data.otp;
+    //   state.message = action.payload.response.data.message;
+    // });
+    // builder.addCase(sendOTPaction.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.message = 'Please try again!';
+    // });
+    // builder.addCase(verifyOtpAction.pending, state => {
+    //   state.loading = true;
+    //   state.message = null;
+    // });
+    // builder.addCase(verifyOtpAction.fulfilled, (state, action) => {
+    //   state.loading = false;
+    // });
+    // builder.addCase(verifyOtpAction.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.message = 'Please try again!';
+    // });
+    // builder.addCase(updatePasswordAction.pending, state => {
+    //   state.loading = true;
+    //   state.message = null;
+    // });
+    // builder.addCase(updatePasswordAction.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   console.log(action.payload, 'upPass action');
+    //   state.message = action.payload.data.message;
+    // });
+    // builder.addCase(updatePasswordAction.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.message = 'Please try again!';
+    // });
   },
 });
 export const {} = Auth.actions;
