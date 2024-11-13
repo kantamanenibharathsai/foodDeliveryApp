@@ -191,7 +191,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import { baseURL, endPoints } from '../../config/locals/config';
+import {baseURL, endPoints} from '../../config/locals/Config';
 import networkCall from '../../config/Networkcalls';
 // import {baseURL, endpoints} from '../../constants/Config';
 // import networkCall from '../../utils/networkCalls';
@@ -222,256 +222,273 @@ interface VerifyPasswordPayload {
   country_code: string;
   otp: string;
 }
-export interface AuthDataType {
-  registerMessage: string | null;
-  loading: boolean;
-  registerLoading: boolean;
-  token: null | string;
-  phoneOrEmail: string;
-  isOtpVerified: boolean;
-  isCompleted: boolean;
-  isSignInActive: boolean;
-  otp: string;
-  errorMassage: string;
-  isLoginSuccess: boolean;
-  user: {
-    full_name: string;
-    mobile_no: string;
-    email: string;
-    role: string;
-    id: string;
-  };
+
+interface User {
+  name: string;
+  email: string;
+  mobile_no: string;
+  id: string;
 }
+export interface RegisterSuccessApiResponse {
+  user: User;
+}
+export interface AuthStateInterface {
+  registerStatus: 'Initial' | 'Loading' | 'Success' | 'Failed';
+  registerSuccessMsg: string;
+  registerErrMsg: string;
+  // user: User;
+}
+// registeredData: null | {
+//   data: {
+//     id: string;
+//     type: string;
+//     attributes: {
+//       created_at: string;
+//       first_name: string;
+//       last_name: string;
+//       email: string;
+//       mobile_number: string;
+//       updated_at: string;
+//     };
+//   };
+// };
+// registerErrMsg: string;
+// registerMessage: string | null;
+// loading: boolean;
+// registerLoading: boolean;
+// token: null | string;
+// phoneOrEmail: string;
+// isOtpVerified: boolean;
+// isCompleted: boolean;
+// isSignInActive: boolean;
+// otp: string;
+// errorMassage: string;
+// isLoginSuccess: boolean;
+// user: {
+//   full_name: string;
+//   mobile_no: string;
+//   email: string;
+//   role: string;
+//   id: string;
+// };
 
-const initialState: AuthDataType = {
-  registerMessage: null,
-  loading: false,
-  registerLoading: false,
-  token: null,
-  phoneOrEmail: '',
-  isOtpVerified: false,
-  isCompleted: false,
-  isSignInActive: true,
-  otp: '',
-  errorMassage: '',
-  isLoginSuccess: false,
-  user: {
-    full_name: '',
-    mobile_no: '',
-    email: '',
-    role: '',
-    id: '',
-  },
+const initialState: AuthStateInterface = {
+  registerStatus: 'Initial',
+  registerSuccessMsg: "",
+  registerErrMsg: "",
+  // loading: false,
+  // registerLoading: false,
+  // token: null,
+  // phoneOrEmail: '',
+  // isOtpVerified: false,
+  // isCompleted: false,
+  // isSignInActive: true,
+  // otp: '',
+  // errorMassage: '',
+  // isLoginSuccess: false,
+  // user: {
+  //   full_name: '',
+  //   mobile_no: '',
+  //   email: '',
+  //   role: '',
+  //   id: '',
+  // },
 };
 
-const setToken = async (token: string) => {
-  await AsyncStorage.setItem('token', token);
-};
-const setOtp = async (otp: string) => {
-  await AsyncStorage.setItem('otp', otp);
-};
+// const setToken = async (token: string) => {
+//   await AsyncStorage.setItem('token', token);
+// };
+// const setOtp = async (otp: string) => {
+//   await AsyncStorage.setItem('otp', otp);
+// };
 
-export const loginAction = createAsyncThunk(
-  'loginAction',
-  async (payload: LoginPayload, {rejectWithValue, fulfillWithValue}) => {
-    console.log(payload, 'login credentials auth');
-    try {
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      };
-      const res = await fetch(baseURL + '/' + endPoints.LOGIN, options);
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log(errorData, '=======>error');
-        return rejectWithValue(errorData.error.error);
-      }
-      const result = await res.json();
-      setToken(result.data.jwtToken);
-      console.log(
-        {token: result.data.jwtToken, user: result.data.user},
-        '=======>success',
-      );
-      return fulfillWithValue(result);
-    } catch (err) {
-      console.log(err, '========>err');
-      return rejectWithValue('Internal server error');
-    }
-  },
-);
+// export const loginAction = createAsyncThunk(
+//   'loginAction',
+//   async (payload: LoginPayload, {rejectWithValue, fulfillWithValue}) => {
+//     console.log(payload, 'login credentials auth');
+//     try {
+//       const options = {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(payload),
+//       };
+//       const res = await fetch(baseURL + '/' + endPoints.LOGIN, options);
+//       if (!res.ok) {
+//         const errorData = await res.json();
+//         console.log(errorData, '=======>error');
+//         return rejectWithValue(errorData.error.error);
+//       }
+//       const result = await res.json();
+//       setToken(result.data.jwtToken);
+//       console.log(
+//         {token: result.data.jwtToken, user: result.data.user},
+//         '=======>success',
+//       );
+//       return fulfillWithValue(result);
+//     } catch (err) {
+//       console.log(err, '========>err');
+//       return rejectWithValue('Internal server error');
+//     }
+//   },
+// );
 
 export const registerAction = createAsyncThunk(
   'registerAction',
-  async (
-    payload: RegisterUserReqInterface,
-    {rejectWithValue, fulfillWithValue},
-  ) => {
-    console.log("payload", 'signUp data', payload);
+  async (payload: RegisterUserReqInterface, {fulfillWithValue, rejectWithValue}) => {
+    console.log('payload', 'signUp data', payload);
     try {
       const options = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: 'bharathsai',
-          mobile_no: '8179041467',
-          email: 'kantamanenibh20@gmail.com',
-          password: '234564',
-          country_code: '91',
-          state: 'pradesh',
-          role: 'CUSTOMER',
-        }),
+        body: JSON.stringify(payload),
       };
-      const response = await fetch("http://192.168.1.10:8089" + '/' + endPoints.SIGNUP, options);
-      //192.168.1.15:8089/user/signUp
-      console.log("payload", payload);
-      if (!response.ok) {
+      const response = await fetch(baseURL + '/' + endPoints.SIGNUP, options);
+      console.log("response", response);
+      if (response.status === 500 || (response.ok === false)) {
         const errorData = await response.json();
-        // console.log(errorData, '=======>error signUp');
         return rejectWithValue(errorData.error.error);
       }
       const result = await response.json();
-      console.log("result", result);
+      console.log('result', result);
       return fulfillWithValue(result);
     } catch (err) {
-      console.log(err, '========>err signUp');
-      return rejectWithValue('Internal server error');
+      console.log(err, '========>err');
+      return rejectWithValue(err);
     }
   },
 );
-export const sendOTPaction = createAsyncThunk(
-  'sendOTPaction',
-  async (
-    {mobile_no, country_code}: {mobile_no: string; country_code: string},
-    {rejectWithValue, fulfillWithValue},
-  ) => {
-    const data = {
-      mobile_no,
-      country_code,
-    };
-    console.log(data, 'send otp');
-    try {
-      const response = await networkCall(
-        endPoints.SEND_OTP,
-        'POST',
-        JSON.stringify(data),
-      );
-      if (response) {
-        console.log(response, 'send otp auth', response.response.data.otp);
-        setOtp(response.response.data.otp);
-        return fulfillWithValue(response);
-      } else {
-        return rejectWithValue('Something went wrong!');
-      }
-    } catch (error) {
-      return rejectWithValue('Something went wrong!');
-    }
-  },
-);
-export const verifyOtpAction = createAsyncThunk(
-  'verifyOtpAction',
-  async (
-    payload: VerifyPasswordPayload,
-    {rejectWithValue, fulfillWithValue},
-  ) => {
-    console.log(payload, 'verify data');
+// export const sendOTPaction = createAsyncThunk(
+//   'sendOTPaction',
+//   async (
+//     {mobile_no, country_code}: {mobile_no: string; country_code: string},
+//     {rejectWithValue, fulfillWithValue},
+//   ) => {
+//     const data = {
+//       mobile_no,
+//       country_code,
+//     };
+//     console.log(data, 'send otp');
+//     try {
+//       const response = await networkCall(
+//         endPoints.SEND_OTP,
+//         'POST',
+//         JSON.stringify(data),
+//       );
+//       if (response) {
+//         console.log(response, 'send otp auth', response.response.data.otp);
+//         setOtp(response.response.data.otp);
+//         return fulfillWithValue(response);
+//       } else {
+//         return rejectWithValue('Something went wrong!');
+//       }
+//     } catch (error) {
+//       return rejectWithValue('Something went wrong!');
+//     }
+//   },
+// );
+// export const verifyOtpAction = createAsyncThunk(
+//   'verifyOtpAction',
+//   async (
+//     payload: VerifyPasswordPayload,
+//     {rejectWithValue, fulfillWithValue},
+//   ) => {
+//     console.log(payload, 'verify data');
 
-    try {
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      };
-      const res = await fetch(baseURL + '/' + endPoints.VERIFY_OTP, options);
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log(errorData, '=======>error verify otp');
-        return rejectWithValue(errorData.error.error);
-      }
-      const result = await res.json();
-      console.log(result, '=======> verify otp result');
-      return fulfillWithValue(result);
-    } catch (error) {
-      console.log(error, 'error');
-      return rejectWithValue('Something went wrong!');
-    }
-  },
-);
-export const updatePasswordAction = createAsyncThunk(
-  'updatePasswordAction',
-  async (
-    payload: UpdatePasswordPayload,
-    {rejectWithValue, fulfillWithValue},
-  ) => {
-    console.log(payload, 'updatePass data');
+//     try {
+//       const options = {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(payload),
+//       };
+//       const res = await fetch(baseURL + '/' + endPoints.VERIFY_OTP, options);
+//       if (!res.ok) {
+//         const errorData = await res.json();
+//         console.log(errorData, '=======>error verify otp');
+//         return rejectWithValue(errorData.error.error);
+//       }
+//       const result = await res.json();
+//       console.log(result, '=======> verify otp result');
+//       return fulfillWithValue(result);
+//     } catch (error) {
+//       console.log(error, 'error');
+//       return rejectWithValue('Something went wrong!');
+//     }
+//   },
+// );
+// export const updatePasswordAction = createAsyncThunk(
+//   'updatePasswordAction',
+//   async (
+//     payload: UpdatePasswordPayload,
+//     {rejectWithValue, fulfillWithValue},
+//   ) => {
+//     console.log(payload, 'updatePass data');
 
-    try {
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      };
+//     try {
+//       const options = {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(payload),
+//       };
 
-      const res = await fetch(
-        baseURL + '/' + endPoints.UPDATE_PASSWORD,
-        options,
-      );
+//       const res = await fetch(
+//         baseURL + '/' + endPoints.UPDATE_PASSWORD,
+//         options,
+//       );
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log(errorData, '=======>error update Password');
-        return rejectWithValue(errorData.error.error);
-      }
+//       if (!res.ok) {
+//         const errorData = await res.json();
+//         console.log(errorData, '=======>error update Password');
+//         return rejectWithValue(errorData.error.error);
+//       }
 
-      const result = await res.json();
-      console.log(result, 'res UpdatePass');
-      return fulfillWithValue(result);
-    } catch (error) {
-      console.log(error, '========>err');
-      return rejectWithValue('Internal server error');
-    }
-  },
-);
+//       const result = await res.json();
+//       console.log(result, 'res UpdatePass');
+//       return fulfillWithValue(result);
+//     } catch (error) {
+//       console.log(error, '========>err');
+//       return rejectWithValue('Internal server error');
+//     }
+//   },
+// );
 
-const Auth = createSlice({
+const AuthSlice = createSlice({
   name: 'AuthSlice',
-  initialState, 
+  initialState,
   reducers: {},
   extraReducers: builder => {
-    builder.addCase(loginAction.pending, state => {
-      state.loading = true;
-      state.message = null;
-    });
-    builder.addCase(loginAction.fulfilled, (state, action) => {
-      state.loading = false;
-      console.log(action.payload, 'login auth action');
-      state.user = action.payload.data.user;
-    });
-    builder.addCase(loginAction.rejected, (state, action) => {
-      state.loading = false;
-      console.log(action.payload, 'login error auth');
-    });
+    // builder.addCase(loginAction.pending, state => {
+    //   state.loading = true;
+    //   state.message = null;
+    // });
+    // builder.addCase(loginAction.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   console.log(action.payload, 'login auth action');
+    //   state.user = action.payload.data.user;
+    // });
+    // builder.addCase(loginAction.rejected, (state, action) => {
+    //   state.loading = false;
+    //   console.log(action.payload, 'login error auth');
+    // });
     builder.addCase(registerAction.pending, state => {
-      state.registerLoading = true;
-      state.registerMessage = null;
-    });
-    builder.addCase(registerAction.fulfilled, (state, action) => {
-      state.registerLoading = false;
-      state.registerMessage = action.payload.data.user;
-      console.log(action.payload, 'resiter auth');
-    });
-    builder.addCase(registerAction.rejected, (state, action) => {
-      state.registerLoading = false;
-      state.registerMessage = 'Please try again!';
-      console.log(action.payload, 'resiter error auth');
+      state.registerStatus = 'Loading';
+      console.log("loading")
+    })
+    .addCase(registerAction.fulfilled, (state, action) => {
+      console.log("action.payload.data.user", action.payload.data.user);
+      state.registerStatus = 'Success';
+      state.registerSuccessMsg = "User Registered Successfully";
+    })
+    .addCase(registerAction.rejected, (state, action) => {
+       state.registerStatus = 'Failed';
+      state.registerErrMsg = action.payload as string;
     });
     // builder.addCase(sendOTPaction.pending, state => {
     //   state.loading = true;
@@ -513,5 +530,5 @@ const Auth = createSlice({
     // });
   },
 });
-export const {} = Auth.actions;
-export default Auth.reducer;
+export const {} = AuthSlice.actions;
+export default AuthSlice.reducer;

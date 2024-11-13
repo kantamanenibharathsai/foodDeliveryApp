@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
@@ -29,18 +30,10 @@ import {AppDispatch, RootState} from '../redux/store';
 import {connect} from 'react-redux';
 import {
   registerAction,
+  RegisterSuccessApiResponse,
   RegisterUserReqInterface,
 } from '../redux/slices/AuthSlice';
-
-interface RegisterFormValues {
-  name: string;
-  phone: string;
-  email: string;
-  passcode: string;
-  confirmPasscode: string;
-  termsAccepted: boolean;
-  stateName: string;
-}
+import {RegisterFormValues} from '../config/Interface';
 
 const RegisterValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -85,8 +78,9 @@ interface RegisterScreenState {
 }
 
 interface RegisterScreenProps {
-  registerLoading: boolean;
-  registerMsg: string | null;
+  registerStatus: 'Initial' | 'Loading' | 'Success' | 'Failed';
+  registerSuccessMsg: string;
+  registerErrMsg: string;
   sendRegisterData: (data: RegisterUserReqInterface) => void;
 }
 
@@ -122,7 +116,6 @@ class RegisterScreen extends Component<
           }}
           validationSchema={RegisterValidationSchema}
           onSubmit={values => {
-            console.log('Form Data:', values);
             const registerData = {
               name: values.name,
               mobile_no: values.phone,
@@ -132,7 +125,6 @@ class RegisterScreen extends Component<
               state: values.stateName,
               role: 'CUSTOMER',
             };
-            console.log("registerData", registerData);
             this.props.sendRegisterData(registerData);
           }}>
           {({
@@ -236,10 +228,10 @@ class RegisterScreen extends Component<
                   <Text style={styles.errorText}>{errors.confirmPasscode}</Text>
                 )}
                 <Dropdown
-                  value={values.stateName} // Use Formik's state here
+                  value={values.stateName}
                   onChange={item => {
-                    this.setValue(item.value); // Update component state (if needed)
-                    setFieldValue('stateName', item.value); // Update Formik's state
+                    this.setValue(item.value);
+                    setFieldValue('stateName', item.value);
                   }}
                   iconStyle={styles.iconStyle}
                   data={statesData.map(state => ({
@@ -278,15 +270,27 @@ class RegisterScreen extends Component<
                     {errors.termsAccepted}
                   </Text>
                 )}
-                {this.props.registerLoading ? (
+                {this.props.registerStatus === 'Initial' && (
+                  <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
+                )}
+                {this.props.registerStatus === 'Loading' && (
                   <View style={styles.loadingContainer}>
-                    <Text style={styles.loadingText}>Loading...</Text>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
                   </View>
-                ) : (
+                )}
+                {this.props.registerStatus === 'Success' && (
                   <>
                     <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
-                    <Text style={styles.registerMsgAPI}>
-                      {this.props.registerMsg}
+                    <Text style={styles.registerSuccMsgAPI}>
+                      {this.props.registerSuccessMsg}
+                    </Text>
+                  </>
+                )}
+                {this.props.registerStatus === 'Failed' && (
+                  <>
+                    <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
+                    <Text style={styles.registerErrMsgAPI}>
+                      {this.props.registerErrMsg}
                     </Text>
                   </>
                 )}
@@ -300,8 +304,9 @@ class RegisterScreen extends Component<
 }
 
 const mapStateToProps = (state: RootState) => ({
-  registerMsg: state.auth.registerMessage,
-  registerLoading: state.auth.registerLoading,
+  registerSuccessMsg: state.auth.registerSuccessMsg,
+  registerStatus: state.auth.registerStatus,
+  registerErrorMsg: state.auth.registerErrMsg,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
@@ -540,10 +545,16 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2),
   },
 
-  registerMsgAPI : {
+  registerSuccMsgAPI: {
     color: colors.green,
     fontSize: responsiveFontSize(2),
     fontFamily: fonts.montserrat.medium,
     marginTop: 3,
-  }
+  },
+  registerErrMsgAPI: {
+    color: colors.red,
+    fontSize: responsiveFontSize(2),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 3,
+  },
 });

@@ -1,6 +1,17 @@
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { ImageSourcePropType } from 'react-native';
 
+
+
+export interface RegisterFormValues {
+    name: string;
+    phone: string;
+    email: string;
+    passcode: string;
+    confirmPasscode: string;
+    termsAccepted: boolean;
+    stateName: string;
+}
 export interface ICarousel {
     item: {
         id: number;
