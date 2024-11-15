@@ -32,21 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>BaiJamjuree-Bold.ttf</string>
@@ -80,23 +66,41 @@
 		<string>MontserratAlternates-Thin.ttf</string>
 		<string>MontserratAlternates-ThinItalic.ttf</string>
 		<string>Ionicons.ttf</string>
-        <string>AntDesign.ttf</string>
-        <string>FontAwesome.ttf</string>
-        <string>FontAwesome5_Brands.ttf</string>
-        <string>FontAwesome5_Regular.ttf</string>
-        <string>FontAwesome5_Solid.ttf</string>
-        <string>FontAwesome6_Brands.ttf</string>
-        <string>FontAwesome6_Regular.ttf</string>
-        <string>FontAwesome6_Solid.ttf</string>
-        <string>Entypo.ttf</string>
-        <string>MaterialIcons.ttf</string>
-        <string>SimpleLineIcons.ttf</string>
-        <string>MaterialCommunityIcons.ttf</string>
-        <string>Fontisto.ttf</string>
-        <string>EvilIcons.ttf</string>
-        <string>Feather.ttf</string>
-        <string>Foundation.ttf</string>
-        <string>Octicons.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
+		<string>Entypo.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>Fontisto.ttf</string>
+		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
+		<string>Foundation.ttf</string>
+		<string>Octicons.ttf</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 </dict>
 </plist>

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {emailIconImg, otpEmailImg, personImg, registerTopImg} from '../assets';
+import {emailIconImg, personImg, registerTopImg} from '../assets';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
@@ -29,11 +29,13 @@ import CustomButton from '../components/Button';
 import {AppDispatch, RootState} from '../redux/store';
 import {connect} from 'react-redux';
 import {
+  ApiStatusConstants,
   registerAction,
-  RegisterSuccessApiResponse,
   RegisterUserReqInterface,
 } from '../redux/slices/AuthSlice';
 import {RegisterFormValues} from '../config/Interface';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterValidationSchema = Yup.object().shape({
   name: Yup.string()
@@ -51,13 +53,21 @@ const RegisterValidationSchema = Yup.object().shape({
     .trim(),
   phone: Yup.string()
     .matches(/^\d{10}$/, '*Phone number must be 10 digits')
-    .required('*Phone number is required'),
+    .required('*Phone number is required')
+    .test('no-spaces', 'Phone Number cannot contain spaces', value => {
+      if (!value) return true;
+      return !value.includes(' ');
+    }),
   email: Yup.string()
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
       '*Invalid email format',
     )
-    .required('*Email is required'),
+    .required('*Email is required')
+    .test('no-spaces', 'MailID cannot contain spaces', value => {
+      if (!value) return true;
+      return !value.includes(' ');
+    }),
   passcode: Yup.string()
     .length(6, '*Passcode must be exactly 6 characters')
     .required('*Passcode is required'),
@@ -78,10 +88,11 @@ interface RegisterScreenState {
 }
 
 interface RegisterScreenProps {
-  registerStatus: 'Initial' | 'Loading' | 'Success' | 'Failed';
+  registerStatus: ApiStatusConstants;
   registerSuccessMsg: string;
-  registerErrMsg: string;
+  registerErrorMsg: string;
   sendRegisterData: (data: RegisterUserReqInterface) => void;
+  navigation: NavigationProp<ParamListBase>;
 }
 
 class RegisterScreen extends Component<
@@ -93,12 +104,40 @@ class RegisterScreen extends Component<
     this.state = {nameFocused: false, emailFocused: false, stateName: ''};
   }
 
-  setValue = (value: string) => {
+  setValue = (value: string): void => {
     this.setState({stateName: value});
   };
 
   renderItem = (item: {label: string; value: string}) => {
     return <Text style={styles.textItem}>{item.value}</Text>;
+  };
+
+  componentDidUpdate(prevProps: RegisterScreenProps) {
+    if (
+      prevProps.registerStatus !== this.props.registerStatus &&
+      this.props.registerStatus === 'Success'
+    ) {
+      setTimeout(() => {
+        this.props.navigation.navigate('OtpVerificationScreen');
+      }, 3000);
+    }
+  }
+
+  handleFormSubmit = async (values: RegisterFormValues) => {
+    const countryCode =
+      (await AsyncStorage.getItem('selectedCountryCode')) || '';
+
+    const registerData: RegisterUserReqInterface = {
+      name: values.name,
+      mobile_no: values.phone,
+      email: values.email,
+      password: values.passcode,
+      country_code: countryCode,
+      state: values.stateName,
+      role: 'CUSTOMER',
+    };
+
+    this.props.sendRegisterData(registerData);
   };
 
   render() {
@@ -115,18 +154,9 @@ class RegisterScreen extends Component<
             stateName: '',
           }}
           validationSchema={RegisterValidationSchema}
-          onSubmit={values => {
-            const registerData = {
-              name: values.name,
-              mobile_no: values.phone,
-              email: values.email,
-              password: values.passcode,
-              country_code: '91',
-              state: values.stateName,
-              role: 'CUSTOMER',
-            };
-            this.props.sendRegisterData(registerData);
-          }}>
+          onSubmit={(values: RegisterFormValues) =>
+            this.handleFormSubmit(values)
+          }>
           {({
             handleChange,
             handleBlur,
@@ -139,7 +169,8 @@ class RegisterScreen extends Component<
             <View style={styles.container}>
               <ImageBackground source={registerTopImg} style={styles.topImg}>
                 <View style={styles.textCont}>
-                  <TouchableOpacity onPress={() => console.log('Go Back')}>
+                  <TouchableOpacity
+                    onPress={() => this.props.navigation.goBack()}>
                     <Entypo
                       name="chevron-small-left"
                       style={styles.leftArrow}
@@ -171,7 +202,9 @@ class RegisterScreen extends Component<
                 )}
                 <PhoneInputField
                   name="phone"
-                  onChangePhone={handleChange('phone')}
+                  onChangePhone={number =>
+                    handleChange('phone')(number.replace(/\s/g, ''))
+                  }
                   onBlur={handleBlur('phone')}
                   value={values.phone}
                   errors={errors}
@@ -182,7 +215,9 @@ class RegisterScreen extends Component<
                     style={styles.input}
                     placeholderTextColor={colors.black}
                     value={values.email}
-                    onChangeText={handleChange('email')}
+                    onChangeText={email =>
+                      handleChange('email')(email.replace(/\s/g, ''))
+                    }
                     onBlur={handleBlur('email')}
                   />
                   <Image style={styles.icon} source={emailIconImg} />
@@ -290,7 +325,7 @@ class RegisterScreen extends Component<
                   <>
                     <CustomButton title="REGISTER NOW" onPress={handleSubmit} />
                     <Text style={styles.registerErrMsgAPI}>
-                      {this.props.registerErrMsg}
+                      {this.props.registerErrorMsg}
                     </Text>
                   </>
                 )}
@@ -547,14 +582,14 @@ const styles = StyleSheet.create({
 
   registerSuccMsgAPI: {
     color: colors.green,
-    fontSize: responsiveFontSize(2),
+    fontSize: responsiveFontSize(1.7),
     fontFamily: fonts.montserrat.medium,
-    marginTop: 3,
+    marginTop: 1,
   },
   registerErrMsgAPI: {
     color: colors.red,
-    fontSize: responsiveFontSize(2),
+    fontSize: responsiveFontSize(1.7),
     fontFamily: fonts.montserrat.medium,
-    marginTop: 3,
+    marginTop: 1,
   },
 });

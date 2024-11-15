@@ -6,44 +6,65 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native';
 import {CountryPicker} from 'react-native-country-codes-picker';
 import {downArrowIcon, phoneIcon} from '../assets';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { responsiveFontSize } from 'react-native-responsive-dimensions';
 
 interface PhoneInputFieldProps {
   onChangePhone: (phone: string) => void;
-  onBlur: (e: any) => void;
+  onBlur: (event: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   value: string;
   name: string;
-  errors: any;
-  touched: any;
+  errors: Record<string, string | undefined>;
+  touched: Record<string, boolean | undefined>;
 }
 
-class PhoneInputField extends Component<PhoneInputFieldProps> {
-  state = {
-    showPicker: false,
-    selectedCountryCode: '+91',
-    selectedFlag: '🇮🇳',
-    selectedCountryAbbreviation: 'IND',
-    noCountriesFound: false,
-    searchQuery: '',
-    placeholderVisible: true,
-  };
+interface PhoneInputFieldState {
+  showPicker: boolean;
+  selectedCountryCode: string;
+  selectedFlag: string;
+  selectedCountryAbbreviation: string;
+  noCountriesFound: boolean;
+  searchQuery: string;
+  placeholderVisible: boolean;
+}
 
-  handlePickerSelect = (country: {
+class PhoneInputField extends Component<
+  PhoneInputFieldProps,
+  PhoneInputFieldState
+> {
+  constructor(props: PhoneInputFieldProps) {
+    super(props);
+    this.state = {
+      showPicker: false,
+      selectedCountryCode: '+91',
+      selectedFlag: '🇮🇳',
+      selectedCountryAbbreviation: 'IND',
+      noCountriesFound: false,
+      searchQuery: '',
+      placeholderVisible: true,
+    };
+  }
+
+  handlePickerSelect = async (country: {
     dial_code: string;
     flag: string;
     code: string;
   }) => {
-    console.log(country.dial_code, country.flag, country.code);
+    console.log('dail-code', country.dial_code);
     this.setState({
       selectedCountryCode: country.dial_code,
       selectedFlag: country.flag,
       selectedCountryAbbreviation: country.code.toUpperCase(),
       showPicker: false,
     });
+    await AsyncStorage.setItem('selectedCountryCode', country.dial_code);
   };
 
   render() {
@@ -51,7 +72,6 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
       showPicker,
       selectedCountryCode,
       selectedFlag,
-      selectedCountryAbbreviation,
       noCountriesFound,
       placeholderVisible,
     } = this.state;
@@ -73,19 +93,20 @@ class PhoneInputField extends Component<PhoneInputFieldProps> {
           <TextInput
             style={[styles.input, styles.commonText]}
             placeholder="Mobile No"
-            placeholderTextColor="transparent"
+            placeholderTextColor={colors.black}
             value={value}
             onChangeText={text => {
-              onChangePhone(text);
+              const filteredText = text.replace(/[^0-9]/g, '');
+              onChangePhone(filteredText);
               this.setState({placeholderVisible: text === ''});
             }}
             onBlur={onBlur}
             keyboardType="phone-pad"
             maxLength={10}
           />
-          {placeholderVisible && (
+          {/* {placeholderVisible && (
             <Text style={styles.placeholderText}>Mobile No</Text>
-          )}
+          )} */}
           <Image source={phoneIcon} style={styles.inputIcon} />
         </View>
 
@@ -198,20 +219,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: colors.red,
-    fontSize: 11,
+    fontSize: responsiveFontSize(1.3),
     marginTop: 5,
     fontFamily: fonts.montserrat.medium,
   },
   commonText: {
     fontSize: 14,
-    fontFamily: 'Montserrat',
+    fontFamily: fonts.montserrat.medium,
   },
   flagCont: {
     width: 24,
     height: 24,
     borderRadius: 100,
-    borderWidth: 1.5,
-    borderColor: '#CFCFCF',
     marginRight: 7,
   },
   flagIcon: {

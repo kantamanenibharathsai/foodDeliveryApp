@@ -1,200 +1,6 @@
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-// import {
-//   IStateSendOpt,
-//   IThunkInterface,
-//   IUserSignUpData,
-// } from '../../config/Interface';
-// import {baseURL, endPoints} from '../../config/locals/Config';
-
-// export interface AuthState {
-//   [x: string]: any;
-//   userInfo: {
-//     email: string;
-//     full_name: string;
-//     id: string;
-//     mobile_no: string;
-//     role: string;
-//   };
-// }
-
-// export const handleSignUp = createAsyncThunk(
-//   'user/signup',
-//   async (data: IUserSignUpData, {fulfillWithValue, rejectWithValue}) => {
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(data),
-//       };
-
-//       const res = await fetch(baseURL + '/' + endPoints.SIGNUP, options);
-
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-
-//       return result;
-//     } catch (err) {
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
-
-// export const handleSendOtp = createAsyncThunk(
-//   'user/Otp',
-//   async (data: IStateSendOpt, {fulfillWithValue, rejectWithValue}) => {
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(data),
-//       };
-
-//       const res = await fetch(baseURL + '/' + endPoints.SEND_OTP, options);
-
-//       if (!res.ok) {
-//         const errorData = await res.json();
-
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-
-//       return result;
-//     } catch (err) {
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
-
-// export const handleVerifyOtp = createAsyncThunk(
-//   'user/otpVerify',
-//   async (
-//     data: {
-//       country_code: string;
-//       mobile_no: string;
-//       otp: string;
-//     },
-//     {fulfillWithValue, rejectWithValue},
-//   ) => {
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(data),
-//       };
-
-//       const res = await fetch(baseURL + '/' + endPoints.VERIFY_OTP, options);
-
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         return rejectWithValue(errorData?.error?.error);
-//       }
-//       const result = await res.json();
-//       return result?.data?.message;
-//     } catch (err) {
-//       return rejectWithValue('Something Went Wong');
-//     }
-//   },
-// );
-
-// export const handleLogin = createAsyncThunk(
-//   'user/signup',
-//   async (
-//     data: IThunkInterface['IStateLogin'],
-//     {fulfillWithValue, rejectWithValue},
-//   ) => {
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(data),
-//       };
-//       const res = await fetch(baseURL + '/' + endPoints.LOGIN, options);
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-//       await AsyncStorage.setItem('userInfo', JSON.stringify(result.data.user));
-//       return result.data.jwtToken;
-//     } catch (err) {
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
-
-// export const handleUpdatePassword = createAsyncThunk(
-//   'user/signup',
-//   async (
-//     data: IThunkInterface['updataPassword'],
-//     {fulfillWithValue, rejectWithValue},
-//   ) => {
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(data),
-//       };
-//       const res = await fetch(
-//         baseURL + '/' + endPoints.UPDATE_PASSWORD,
-//         options,
-//       );
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-//       return result.data.message;
-//     } catch (err) {
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
-
-// const initialState: AuthState = {
-//   userInfo: {
-//     email: '',
-//     full_name: '',
-//     id: '',
-//     mobile_no: '',
-//     role: '',
-//   },
-// };
-
-// export const AuthSlice = createSlice({
-//   name: 'Auth',
-//   initialState,
-//   reducers: {
-//     loginUserInfo: (state, action) => {
-//       state.userInfo = action.payload;
-//     },
-//   },
-//   extraReducers: buider => {},
-// });
-
-// export const {loginUserInfo} = AuthSlice.actions;
-
-// export default AuthSlice.reducer;
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {baseURL, endPoints} from '../../config/locals/Config';
-import networkCall from '../../config/Networkcalls';
-// import {baseURL, endpoints} from '../../constants/Config';
-// import networkCall from '../../utils/networkCalls';
 
 export interface RegisterUserReqInterface {
   name: string;
@@ -205,139 +11,76 @@ export interface RegisterUserReqInterface {
   state: string;
   role: string;
 }
-interface LoginPayload {
+
+export interface SendOTPReqInterface {
   mobile_no: string;
   country_code: string;
-  password: string;
-  role: string;
 }
-interface UpdatePasswordPayload {
-  mobile_no: string;
-  country_code: string;
-  newPassword: string;
-  confirmPassword: string;
-}
-interface VerifyPasswordPayload {
+
+export interface verifyOTPReqInterface {
   mobile_no: string;
   country_code: string;
   otp: string;
 }
 
-interface User {
+export interface loginReqInterface {
+  mobile_no: string;
+  password: string;
+  role: string;
+  country_code: string;
+}
+
+export type ApiStatusConstants = 'Initial' | 'Loading' | 'Success' | 'Failed';
+
+export interface AuthStateInterface {
+  registerStatus: ApiStatusConstants;
+  registerSuccessMsg: string;
+  registerErrMsg: string;
+  sendOTPStatus: ApiStatusConstants;
+  sendOTPSuccessMsg: string;
+  sendOTPFailureMsg: string;
+  verifyOTPStatus: ApiStatusConstants;
+  verifyOTPSuccessMsg: string;
+  verifyOTPFailureMsg: string;
+  loginStatus: ApiStatusConstants;
+  loginSuccessMsgToken: string;
+  loginErrMsg: string;
+}
+
+const initialState: AuthStateInterface = {
+  registerStatus: 'Initial',
+  registerSuccessMsg: '',
+  registerErrMsg: '',
+  sendOTPStatus: 'Initial',
+  sendOTPSuccessMsg: '',
+  sendOTPFailureMsg: '',
+  verifyOTPStatus: 'Initial',
+  verifyOTPSuccessMsg: '',
+  verifyOTPFailureMsg: '',
+  loginStatus: 'Initial',
+  loginSuccessMsgToken: '',
+  loginErrMsg: '',
+};
+
+interface RegisterSuccessAPIUser {
   name: string;
   email: string;
   mobile_no: string;
   id: string;
 }
-export interface RegisterSuccessApiResponse {
-  user: User;
-}
-export interface AuthStateInterface {
-  registerStatus: 'Initial' | 'Loading' | 'Success' | 'Failed';
-  registerSuccessMsg: string;
-  registerErrMsg: string;
-  // user: User;
-}
-// registeredData: null | {
-//   data: {
-//     id: string;
-//     type: string;
-//     attributes: {
-//       created_at: string;
-//       first_name: string;
-//       last_name: string;
-//       email: string;
-//       mobile_number: string;
-//       updated_at: string;
-//     };
-//   };
-// };
-// registerErrMsg: string;
-// registerMessage: string | null;
-// loading: boolean;
-// registerLoading: boolean;
-// token: null | string;
-// phoneOrEmail: string;
-// isOtpVerified: boolean;
-// isCompleted: boolean;
-// isSignInActive: boolean;
-// otp: string;
-// errorMassage: string;
-// isLoginSuccess: boolean;
-// user: {
-//   full_name: string;
-//   mobile_no: string;
-//   email: string;
-//   role: string;
-//   id: string;
-// };
 
-const initialState: AuthStateInterface = {
-  registerStatus: 'Initial',
-  registerSuccessMsg: "",
-  registerErrMsg: "",
-  // loading: false,
-  // registerLoading: false,
-  // token: null,
-  // phoneOrEmail: '',
-  // isOtpVerified: false,
-  // isCompleted: false,
-  // isSignInActive: true,
-  // otp: '',
-  // errorMassage: '',
-  // isLoginSuccess: false,
-  // user: {
-  //   full_name: '',
-  //   mobile_no: '',
-  //   email: '',
-  //   role: '',
-  //   id: '',
-  // },
+const setRegisterAPIData = async (apiData: RegisterSuccessAPIUser) => {
+  const selectedCountryCode = await AsyncStorage.getItem('selectedCountryCode');
+  console.log('setRegisterAPIData', apiData, selectedCountryCode);
+  await AsyncStorage.setItem(
+    'registerAPIData',
+    JSON.stringify({...apiData, selectedCountryCode}),
+  );
 };
-
-// const setToken = async (token: string) => {
-//   await AsyncStorage.setItem('token', token);
-// };
-// const setOtp = async (otp: string) => {
-//   await AsyncStorage.setItem('otp', otp);
-// };
-
-// export const loginAction = createAsyncThunk(
-//   'loginAction',
-//   async (payload: LoginPayload, {rejectWithValue, fulfillWithValue}) => {
-//     console.log(payload, 'login credentials auth');
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(payload),
-//       };
-//       const res = await fetch(baseURL + '/' + endPoints.LOGIN, options);
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         console.log(errorData, '=======>error');
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-//       setToken(result.data.jwtToken);
-//       console.log(
-//         {token: result.data.jwtToken, user: result.data.user},
-//         '=======>success',
-//       );
-//       return fulfillWithValue(result);
-//     } catch (err) {
-//       console.log(err, '========>err');
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
 
 export const registerAction = createAsyncThunk(
   'registerAction',
-  async (payload: RegisterUserReqInterface, {fulfillWithValue, rejectWithValue}) => {
-    console.log('payload', 'signUp data', payload);
+  async (payload: RegisterUserReqInterface, {rejectWithValue}) => {
     try {
       const options = {
         method: 'POST',
@@ -346,189 +89,180 @@ export const registerAction = createAsyncThunk(
         },
         body: JSON.stringify(payload),
       };
-      const response = await fetch(baseURL + '/' + endPoints.SIGNUP, options);
-      console.log("response", response);
-      if (response.status === 500 || (response.ok === false)) {
+      console.log('registering ', payload);
+      const response = await fetch(`${baseURL}/${endPoints.SIGNUP}`, options);
+      if (!response.ok) {
         const errorData = await response.json();
-        return rejectWithValue(errorData.error.error);
+        return rejectWithValue(errorData.error.error || 'An error occurred');
       }
       const result = await response.json();
       console.log('result', result);
-      return fulfillWithValue(result);
+      setRegisterAPIData(result.user);
+      return result;
     } catch (err) {
-      console.log(err, '========>err');
-      return rejectWithValue(err);
+      return rejectWithValue('Network request failed');
     }
   },
 );
-// export const sendOTPaction = createAsyncThunk(
-//   'sendOTPaction',
-//   async (
-//     {mobile_no, country_code}: {mobile_no: string; country_code: string},
-//     {rejectWithValue, fulfillWithValue},
-//   ) => {
-//     const data = {
-//       mobile_no,
-//       country_code,
-//     };
-//     console.log(data, 'send otp');
-//     try {
-//       const response = await networkCall(
-//         endPoints.SEND_OTP,
-//         'POST',
-//         JSON.stringify(data),
-//       );
-//       if (response) {
-//         console.log(response, 'send otp auth', response.response.data.otp);
-//         setOtp(response.response.data.otp);
-//         return fulfillWithValue(response);
-//       } else {
-//         return rejectWithValue('Something went wrong!');
-//       }
-//     } catch (error) {
-//       return rejectWithValue('Something went wrong!');
-//     }
-//   },
-// );
-// export const verifyOtpAction = createAsyncThunk(
-//   'verifyOtpAction',
-//   async (
-//     payload: VerifyPasswordPayload,
-//     {rejectWithValue, fulfillWithValue},
-//   ) => {
-//     console.log(payload, 'verify data');
 
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(payload),
-//       };
-//       const res = await fetch(baseURL + '/' + endPoints.VERIFY_OTP, options);
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         console.log(errorData, '=======>error verify otp');
-//         return rejectWithValue(errorData.error.error);
-//       }
-//       const result = await res.json();
-//       console.log(result, '=======> verify otp result');
-//       return fulfillWithValue(result);
-//     } catch (error) {
-//       console.log(error, 'error');
-//       return rejectWithValue('Something went wrong!');
-//     }
-//   },
-// );
-// export const updatePasswordAction = createAsyncThunk(
-//   'updatePasswordAction',
-//   async (
-//     payload: UpdatePasswordPayload,
-//     {rejectWithValue, fulfillWithValue},
-//   ) => {
-//     console.log(payload, 'updatePass data');
+export const sendOTPAction = createAsyncThunk(
+  'sendOTPaction',
+  async (payload: SendOTPReqInterface, {rejectWithValue}) => {
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+      console.log('sendOTPActionPayload', payload);
+      const response = await fetch(`${baseURL}/${endPoints.SEND_OTP}`, options);
+      // console.log("responseobj", await response.json());
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const sendOtpData = await response.json();
+      console.log('sendOTPSuccess', sendOtpData);
+      return sendOtpData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
 
-//     try {
-//       const options = {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(payload),
-//       };
+export const verifyOTPAction = createAsyncThunk(
+  'verifyOTPaction',
+  async (payload: verifyOTPReqInterface, {rejectWithValue}) => {
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+      console.log('verifyOTPActionPayload', payload);
+      const response = await fetch(
+        `${baseURL}/${endPoints.VERIFY_OTP}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const verifyOtpData = await response.json();
+      console.log('verifyOTPSuccess', verifyOtpData);
+      return verifyOtpData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
 
-//       const res = await fetch(
-//         baseURL + '/' + endPoints.UPDATE_PASSWORD,
-//         options,
-//       );
-
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         console.log(errorData, '=======>error update Password');
-//         return rejectWithValue(errorData.error.error);
-//       }
-
-//       const result = await res.json();
-//       console.log(result, 'res UpdatePass');
-//       return fulfillWithValue(result);
-//     } catch (error) {
-//       console.log(error, '========>err');
-//       return rejectWithValue('Internal server error');
-//     }
-//   },
-// );
+export const loginAction = createAsyncThunk(
+  'loginAction',
+  async (payload: loginReqInterface, {rejectWithValue}) => {
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+      console.log('loginActionPayload', payload);
+      const response = await fetch(`${baseURL}/${endPoints.LOGIN}`, options);
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const loginData = await response.json();
+      if (loginData?.data?.jwtToken)
+        await AsyncStorage.setItem('jwtToken', loginData?.data?.jwtToken);
+      console.log('loginSuccess', loginData);
+      return loginData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
 
 const AuthSlice = createSlice({
   name: 'AuthSlice',
   initialState,
   reducers: {},
   extraReducers: builder => {
-    // builder.addCase(loginAction.pending, state => {
-    //   state.loading = true;
-    //   state.message = null;
-    // });
-    // builder.addCase(loginAction.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   console.log(action.payload, 'login auth action');
-    //   state.user = action.payload.data.user;
-    // });
-    // builder.addCase(loginAction.rejected, (state, action) => {
-    //   state.loading = false;
-    //   console.log(action.payload, 'login error auth');
-    // });
     builder.addCase(registerAction.pending, state => {
       state.registerStatus = 'Loading';
-      console.log("loading")
-    })
-    .addCase(registerAction.fulfilled, (state, action) => {
-      console.log("action.payload.data.user", action.payload.data.user);
+      state.registerSuccessMsg = '';
+      state.registerErrMsg = '';
+    });
+    builder.addCase(registerAction.fulfilled, (state, action) => {
+      console.log('action.payload', action.payload);
       state.registerStatus = 'Success';
-      state.registerSuccessMsg = "User Registered Successfully";
-    })
-    .addCase(registerAction.rejected, (state, action) => {
-       state.registerStatus = 'Failed';
+      state.registerSuccessMsg = 'User Registered Successfully';
+      state.registerErrMsg = '';
+    });
+    builder.addCase(registerAction.rejected, (state, action) => {
+      console.log('rejected');
+      state.registerStatus = 'Failed';
+      state.registerSuccessMsg = '';
       state.registerErrMsg = action.payload as string;
     });
-    // builder.addCase(sendOTPaction.pending, state => {
-    //   state.loading = true;
-    //   state.message = null;
-    // });
-    // builder.addCase(sendOTPaction.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   console.log(action.payload.response.data.otp, 'thunk');
-    //   state.otp = action.payload.response.data.otp;
-    //   state.message = action.payload.response.data.message;
-    // });
-    // builder.addCase(sendOTPaction.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.message = 'Please try again!';
-    // });
-    // builder.addCase(verifyOtpAction.pending, state => {
-    //   state.loading = true;
-    //   state.message = null;
-    // });
-    // builder.addCase(verifyOtpAction.fulfilled, (state, action) => {
-    //   state.loading = false;
-    // });
-    // builder.addCase(verifyOtpAction.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.message = 'Please try again!';
-    // });
-    // builder.addCase(updatePasswordAction.pending, state => {
-    //   state.loading = true;
-    //   state.message = null;
-    // });
-    // builder.addCase(updatePasswordAction.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   console.log(action.payload, 'upPass action');
-    //   state.message = action.payload.data.message;
-    // });
-    // builder.addCase(updatePasswordAction.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.message = 'Please try again!';
-    // });
+
+    builder.addCase(sendOTPAction.pending, state => {
+      state.sendOTPStatus = 'Loading';
+      state.sendOTPSuccessMsg = '';
+      state.sendOTPFailureMsg = '';
+    });
+    builder.addCase(sendOTPAction.fulfilled, (state, action) => {
+      console.log('action.payloadONE', action.payload.data);
+      state.sendOTPStatus = 'Success';
+      state.sendOTPSuccessMsg = action.payload.data?.otp || '';
+      state.sendOTPFailureMsg = '';
+    });
+    builder.addCase(sendOTPAction.rejected, (state, action) => {
+      state.sendOTPStatus = 'Failed';
+      state.sendOTPSuccessMsg = '';
+      state.sendOTPFailureMsg = action.payload as string;
+    });
+
+    builder.addCase(verifyOTPAction.pending, state => {
+      state.verifyOTPStatus = 'Loading';
+      state.verifyOTPSuccessMsg = '';
+      state.verifyOTPFailureMsg = '';
+    });
+    builder.addCase(verifyOTPAction.fulfilled, (state, action) => {
+      console.log('action.payloadTWO', action.payload.data);
+      state.verifyOTPStatus = 'Success';
+      state.verifyOTPSuccessMsg = action.payload.data?.message || '';
+      state.verifyOTPFailureMsg = '';
+    });
+    builder.addCase(verifyOTPAction.rejected, (state, action) => {
+      state.verifyOTPStatus = 'Failed';
+      state.verifyOTPSuccessMsg = '';
+      state.verifyOTPFailureMsg = action.payload as string;
+    });
+
+    builder.addCase(loginAction.pending, state => {
+      state.loginStatus = 'Loading';
+      state.loginSuccessMsgToken = '';
+      state.loginErrMsg = '';
+    });
+    builder.addCase(loginAction.fulfilled, (state, action) => {
+      console.log('action.payloadThree', action.payload.data);
+      state.loginStatus = 'Success';
+      state.loginSuccessMsgToken = action.payload.data?.jwtToken || '';
+      state.loginErrMsg = '';
+    });
+    builder.addCase(loginAction.rejected, (state, action) => {
+      state.loginStatus = 'Failed';
+      state.loginSuccessMsgToken = '';
+      state.loginErrMsg = action.payload as string;
+    });
   },
 });
-export const {} = AuthSlice.actions;
+
 export default AuthSlice.reducer;

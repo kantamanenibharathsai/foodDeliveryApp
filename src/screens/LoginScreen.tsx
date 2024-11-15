@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
-import {Text, StyleSheet, View, ImageBackground, Image} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  ImageBackground,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 import {loginFoodPlateBg, loginRedBg} from '../assets';
 import {
+  responsiveFontSize,
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
@@ -13,45 +21,90 @@ import PhoneInputField from '../components/PhoneInputField';
 import {OtpInput} from 'react-native-otp-entry';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../components/Button';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  ApiStatusConstants,
+  loginAction,
+  loginReqInterface,
+} from '../redux/slices/AuthSlice';
+import {connect} from 'react-redux';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const validationSchema = Yup.object().shape({
+const loginValidationSchema = Yup.object().shape({
   phone: Yup.string()
+    .matches(/^\d{10}$/, '*Phone number must be 10 digits')
     .required('*Phone number is required')
-    .matches(
-      /^\d{10,15}$/,
-      '*Phone number must contain only digits and be between 10 to 15 digits',
-    ),
+    .test('no-spaces', 'Phone Number cannot contain spaces', value => {
+      if (!value) return true;
+      return !value.includes(' ');
+    }),
+  passcode: Yup.string()
+    .length(6, '*Passcode must be exactly 6 characters')
+    .required('*Passcode is required'),
 });
 
+export interface LoginFormValues {
+  phone: string;
+  passcode: string;
+}
 
-class LoginScreen extends Component {
-  constructor(props: any) {
+interface LoginProps {
+  loginSuccessMsgToken: string;
+  loginStatus: ApiStatusConstants;
+  loginErrMsg: string;
+  sendLoginData: (data: loginReqInterface) => void;
+  navigation: NavigationProp<ParamListBase>;
+}
+
+interface LoginState {
+  selectedRole: string;
+}
+
+class LoginScreen extends Component<LoginProps, LoginState> {
+  constructor(props: LoginProps) {
     super(props);
     this.state = {
-      otp: '',
-      maskTimer: null,
+      selectedRole: 'CUSTOMER',
     };
   }
 
-  // handleOtpChange = text => {
-  //   // Clear any existing timer
-  //   if (this.state.maskTimer) {
-  //     clearTimeout(this.state.maskTimer);
-  //   }
+  componentDidUpdate(prevProps: LoginProps) {
+    if (
+      prevProps.loginStatus !== this.props.loginStatus &&
+      this.props.loginStatus === 'Success'
+    ) {
+      this.props.navigation.navigate('BottomTab');
+    }
+  }
 
-  //   // Update OTP
-  //   this.setState({otp: text});
+  registerNowPress = () => {
+    this.props.navigation.navigate('RegisterScreen');
+  };
 
-  //   // Set a timer to mask the input
-  //   const timer = setTimeout(() => {
-  //     this.setState({otp: '*'.repeat(text.length)}); // Mask with asterisks
-  //   }, 300); // Change this value for the delay
+  forgotPasswordPress = () => {
+    this.props.navigation.navigate('ForgotPasscodeScreen');
+  };
 
-  //   this.setState({maskTimer: timer});
-  // };
+  handleFormSubmit = async (values: LoginFormValues) => {
+    const countryCode =
+      (await AsyncStorage.getItem('selectedCountryCode')) || '';
+    const loginData: loginReqInterface = {
+      mobile_no: values.phone,
+      password: values.passcode,
+      role: this.state.selectedRole,
+      country_code: countryCode,
+    };
+    this.props.sendLoginData(loginData);
+  };
+
+  selectRoleFunc = (roleType: string) => {
+    this.setState({selectedRole: roleType});
+  };
 
   render() {
+    const {selectedRole} = this.state;
+
     return (
       <View style={styles.container}>
         <ImageBackground source={loginRedBg} style={styles.backgroundRedImg}>
@@ -61,14 +114,16 @@ class LoginScreen extends Component {
           </View>
           <Image style={styles.foodPlateImg} source={loginFoodPlateBg} />
         </ImageBackground>
-
         <View style={styles.belowContainer}>
-          <Formik
-            initialValues={{phone: ''}}
-            validationSchema={validationSchema}
-            onSubmit={values => {
-              console.log('Form submitted:', values);
-            }}>
+          <Formik<LoginFormValues>
+            initialValues={{
+              phone: '',
+              passcode: '',
+            }}
+            validationSchema={loginValidationSchema}
+            onSubmit={(values: LoginFormValues) =>
+              this.handleFormSubmit(values)
+            }>
             {({
               handleChange,
               handleBlur,
@@ -76,71 +131,116 @@ class LoginScreen extends Component {
               values,
               errors,
               touched,
+              setFieldValue,
             }) => (
-              <View>
+              <>
                 <PhoneInputField
-                  onChangePhone={handleChange('phone')}
+                  name="phone"
+                  onChangePhone={number =>
+                    handleChange('phone')(number.replace(/\s/g, ''))
+                  }
                   onBlur={handleBlur('phone')}
                   value={values.phone}
-                  name="mobile no"
                   errors={errors}
                   touched={touched}
                 />
-                {touched.phone && errors.phone ? (
-                  <Text style={styles.errorText}>{errors.phone}</Text>
-                ) : null}
-              </View>
+                <Text style={styles.passcodeText}>Passcode</Text>
+                <OtpInput
+                  numberOfDigits={6}
+                  focusColor="green"
+                  secureTextEntry={true}
+                  onFilled={text => setFieldValue('passcode', text)}
+                  onBlur={() => handleBlur('passcode')}
+                  theme={{
+                    containerStyle: styles.otpContainer,
+                    pinCodeContainerStyle: styles.pinCodeBox,
+                    pinCodeTextStyle: styles.otpText,
+                    focusStickStyle: styles.focusStick,
+                    focusedPinCodeContainerStyle: styles.activePinCodeBox,
+                  }}
+                />
+                {touched.passcode && errors.passcode && (
+                  <Text style={styles.errorText}>{errors.passcode}</Text>
+                )}
+
+                <Text
+                  style={styles.forgotPasscodeText}
+                  onPress={this.forgotPasswordPress}>
+                  Forgot Passcode
+                </Text>
+                <View style={styles.custoSellerContainer}>
+                  <View style={styles.radioLabelCont}>
+                    <MaterialIcons
+                      name={'radio-button-checked'}
+                      size={20}
+                      color={
+                        selectedRole === 'CUSTOMER'
+                          ? colors.red
+                          : colors.lightTextColor
+                      }
+                      onPress={() => this.selectRoleFunc('CUSTOMER')}
+                    />
+                    <Text style={styles.radioLabel}>Customer</Text>
+                  </View>
+                  <View style={styles.radioLabelCont}>
+                    <MaterialIcons
+                      name={'radio-button-checked'}
+                      size={20}
+                      color={
+                        selectedRole === 'SELLER'
+                          ? colors.red
+                          : colors.lightTextColor
+                      }
+                      onPress={() => this.selectRoleFunc('SELLER')}
+                    />
+                    <Text style={styles.radioLabel}>Seller</Text>
+                  </View>
+                </View>
+                {this.props.loginStatus === 'Initial' && (
+                  <CustomButton title="Login" onPress={handleSubmit} />
+                )}
+                {this.props.loginStatus === 'Loading' && (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                )}
+                {this.props.loginStatus === 'Success' && (
+                  <>
+                    <CustomButton title="Login" onPress={handleSubmit} />
+                    <Text style={styles.loginSuccMsgAPI}>Login Successful</Text>
+                  </>
+                )}
+                {this.props.loginStatus === 'Failed' && (
+                  <>
+                    <CustomButton title="Login" onPress={handleSubmit} />
+                    <Text style={styles.loginErrMsgAPI}>
+                      {this.props.loginErrMsg}
+                    </Text>
+                  </>
+                )}
+              </>
             )}
           </Formik>
-
-          <Text style={styles.passcodeText}>Passcode</Text>
-
-          <OtpInput
-            numberOfDigits={6}
-            focusColor="green"
-            secureTextEntry={false}
-            onFilled={text => console.log(`OTP complete: ${text}`)}
-            textInputProps={{
-              accessibilityLabel: 'One-Time Password',
-            }}
-            theme={{
-              containerStyle: styles.otpContainer,
-              pinCodeContainerStyle: styles.pinCodeBox,
-              pinCodeTextStyle: styles.otpText,
-              focusStickStyle: styles.focusStick,
-              focusedPinCodeContainerStyle: styles.activePinCodeBox,
-            }}
-          />
-          <Text style={styles.forgotPasscodeText}>Forgot Passcode</Text>
-
-          <View style={styles.custoSellerContainer}>
-            <View style={styles.radioLabelCont}>
-              <MaterialIcons
-                name="radio-button-checked"
-                size={20}
-                color={colors.red}
-              />
-              <Text style={styles.radioLabel}>Customer</Text>
-            </View>
-            <View style={styles.radioLabelCont}>
-              <MaterialIcons
-                name="radio-button-checked"
-                size={20}
-                color={'grey'}
-              />
-              <Text style={styles.radioLabel}>Seller</Text>
-            </View>
-          </View>
+          <Text style={styles.registerText} onPress={this.registerNowPress}>
+            Register now?
+          </Text>
         </View>
-        <CustomButton
-          title="Login"
-          onPress={() => console.log('Button Pressed')}
-        />
-        <Text style={styles.registerText}>Register now?</Text>
       </View>
     );
   }
 }
+
+const mapStateToProps = (state: RootState) => ({
+  loginSuccessMsgToken: state.auth.loginSuccessMsgToken,
+  loginStatus: state.auth.loginStatus,
+  loginErrMsg: state.auth.loginErrMsg,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  sendLoginData: (data: loginReqInterface) => dispatch(loginAction(data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -182,17 +282,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   errorText: {
-    fontSize: 14,
-    color: 'red',
-    marginTop: 5,
-    marginLeft: 20,
+    fontSize: responsiveFontSize(1.5),
+    color: colors.red,
+    marginTop: -13,
   },
   passcodeText: {
     fontFamily: fonts.montserrat.bold,
     fontSize: 16,
     color: colors.black,
-    fontWeight: '600',
-    marginTop: 10,
+    marginTop: 8,
   },
   otpContainer: {
     flexDirection: 'row',
@@ -223,12 +321,11 @@ const styles = StyleSheet.create({
     width: '60%',
   },
   forgotPasscodeText: {
-    marginTop: -10,
-    fontSize: 16,
+    marginTop: -7,
+    fontSize: responsiveFontSize(1.9),
     color: colors.red,
     alignSelf: 'flex-end',
-    fontWeight: '600',
-    fontFamily: fonts.montserrat.medium,
+    fontFamily: fonts.montserrat.bold,
   },
   custoSellerContainer: {
     flexDirection: 'row',
@@ -259,6 +356,35 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
   },
-});
 
-export default LoginScreen;
+  loadingContainer: {
+    width: 385,
+    height: 75,
+    alignSelf: 'center',
+    borderRadius: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    marginVertical: 10,
+    shadowColor: '#94CD00',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
+    elevation: 12,
+  },
+
+  loginSuccMsgAPI: {
+    color: colors.green,
+    fontSize: responsiveFontSize(1.5),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 1,
+  },
+  loginErrMsgAPI: {
+    color: colors.red,
+    fontSize: responsiveFontSize(1.5),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 1,
+  },
+});

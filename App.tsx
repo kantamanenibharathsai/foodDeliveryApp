@@ -44,13 +44,12 @@ const App = () => {
       <NavigationContainer>
         <StatusBar
           backgroundColor={'rgba(0,0,0,0)'}
-          
           translucent={true}
           barStyle={'light-content'}
         />
         <Stack.Navigator
           screenOptions={{headerShown: false}}
-          initialRouteName="RegisterScreen">
+          initialRouteName="LoginScreen">
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -61,7 +60,7 @@ const App = () => {
             component={OtpVerificationScreen}
           />
           <Stack.Screen
-            name="AllowlocationScreen"
+            name="AllowLocationScreen"
             component={AllowLocationScreen}
           />
           <Stack.Screen

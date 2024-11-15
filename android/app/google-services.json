@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "587419303526",
+    "project_id": "pushnotifications-7fa05",
+    "storage_bucket": "pushnotifications-7fa05.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587419303526:android:df8653b5b7403c774f77a7",
+        "android_client_info": {
+          "package_name": "com.fooddeliveryapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAil3Ad2HOqp1I4QR1tA5iOnGF72pBI4jI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587419303526:android:628bd64778f5b2004f77a7",
+        "android_client_info": {
+          "package_name": "com.pushnotifications"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAil3Ad2HOqp1I4QR1tA5iOnGF72pBI4jI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

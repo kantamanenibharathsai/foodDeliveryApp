@@ -1,4 +1,4 @@
-export const baseURL = 'http://192.168.1.11:8089';
+export const baseURL = 'http://192.168.1.17:8089';
 export const endPoints = {
     SIGNUP: 'user/signUp',
     LOGIN: 'user/login',
