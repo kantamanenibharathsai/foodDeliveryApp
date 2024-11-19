@@ -55,6 +55,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bai.black,
     fontWeight: '600',
     textTransform: 'uppercase',
-    fontSize: responsiveFontSize(2),
+    fontSize: responsiveFontSize(2.3),
   },
 });

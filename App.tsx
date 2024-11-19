@@ -33,8 +33,11 @@ import CategoryScreen from './src/screens/CategoryScreen';
 import PizzaCategoryScreenOne from './src/screens/PizzaCategoryScreenOne';
 import BurgerCategoryScreenTwo from './src/screens/BurgerCategoryScreen2';
 import SingleProductPageScreen from './src/screens/SingleProductPageScreen';
-import { Provider } from 'react-redux';
-import { store } from './src/redux/Store';
+import {Provider} from 'react-redux';
+import {store} from './src/redux/Store';
+import BankAccountScreen from './src/screens/BankAccountScreen';
+import UPIScreen from './src/screens/UPIScreen';
+import CreditCardScreen from './src/screens/CreditCardScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,7 +52,7 @@ const App = () => {
         />
         <Stack.Navigator
           screenOptions={{headerShown: false}}
-          initialRouteName="LoginScreen">
+          initialRouteName="ForgotPasscodeScreen">
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -135,6 +138,12 @@ const App = () => {
             name="SingleProductPageScreen"
             component={SingleProductPageScreen}
           />
+          <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} />
+          <Stack.Screen
+            name="BankAccountScreen"
+            component={BankAccountScreen}
+          />
+          <Stack.Screen name="UPIScreen" component={UPIScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

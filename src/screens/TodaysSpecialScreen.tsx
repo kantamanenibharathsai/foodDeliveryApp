@@ -27,8 +27,7 @@ class TodaySpecialScreen extends Component<Props> {
           </TouchableOpacity>
           <Text style={styles.restNearByText}>Today Special</Text>
         </View>
-        <View
-          style={styles.bodyCont}>
+        <View style={styles.bodyCont}>
           <TodaySpecial />
         </View>
       </View>

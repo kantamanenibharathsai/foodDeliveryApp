@@ -10,6 +10,7 @@ import {
   ImageSourcePropType,
   Image,
   TextInput,
+  StatusBar,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {colors} from '../utils/Colors';
@@ -23,6 +24,8 @@ import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import {burgerPizzaImg} from '../assets';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CustomButton from '../components/Button';
+import PaymentModal from '../components/ChooseYourPaymentMethod';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 interface Item {
   id: number;
@@ -91,6 +94,7 @@ interface Props {
 interface State {
   cartItems: Item[];
   quantity: number;
+  isModalVisible: boolean;
 }
 
 class CheckoutScreen extends Component<Props, State> {
@@ -99,6 +103,7 @@ class CheckoutScreen extends Component<Props, State> {
     this.state = {
       cartItems: cartData,
       quantity: 1,
+      isModalVisible: false,
     };
   }
 
@@ -124,16 +129,24 @@ class CheckoutScreen extends Component<Props, State> {
     }));
   };
 
+  setIsModalVisible = () => {
+    this.setState({isModalVisible: !this.state.isModalVisible});
+  };
+
   render() {
     return (
       <>
+        <StatusBar
+          backgroundColor={'rgba(0,0,0,0)'}
+          translucent={true}
+          barStyle={'light-content'}
+        />
         <View style={styles.reviewsHeader}>
           <TouchableOpacity onPress={this.handleGoBack} style={styles.leftIcon}>
             <Entypo name="chevron-small-left" size={30} color={colors.black} />
           </TouchableOpacity>
           <Text style={styles.reviewsText}>Checkout</Text>
         </View>
-
         <ScrollView style={styles.container}>
           <View style={styles.bodyCont}>
             <View style={styles.orderItemDetailsCont}>
@@ -235,7 +248,6 @@ class CheckoutScreen extends Component<Props, State> {
                 <Text style={styles.grandTotalValue}>₹324</Text>
               </View>
             </View>
-
             <View style={styles.orderItemDetailsCont}>
               <Text style={styles.commonName}>Order Item Details</Text>
               <View style={styles.yellowCont}>
@@ -251,7 +263,6 @@ class CheckoutScreen extends Component<Props, State> {
                   <Icon name="delete" size={22} color={colors.black} />
                 </View>
               </View>
-
               <View style={styles.yellowCont}>
                 <View style={styles.radioCont}>
                   <Icon name="radio-button-on" size={23} />
@@ -265,18 +276,19 @@ class CheckoutScreen extends Component<Props, State> {
                   <Icon name="delete" size={22} color={colors.black} />
                 </View>
               </View>
-
               <Text style={styles.addNewAddress}>Add New Delivery Address</Text>
-
               <CustomButton
                 title={'CONTINUE'}
-                onPress={() => {
-                  /* Handle button press */
-                }}
+                onPress={this.setIsModalVisible}
               />
             </View>
           </View>
         </ScrollView>
+        {this.state.isModalVisible && (
+          <GestureHandlerRootView style={styles.container}>
+            <PaymentModal setIsModalVisible={this.setIsModalVisible} />
+          </GestureHandlerRootView>
+        )}
       </>
     );
   }
@@ -324,7 +336,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(4),
     paddingVertical: responsiveWidth(5),
     gap: 10,
-    backgroundColor: colors.white
+    backgroundColor: colors.white,
   },
 
   commonName: {
@@ -656,6 +668,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textDecorationLine: 'underline',
   },
-
-  
 });

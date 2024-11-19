@@ -138,7 +138,7 @@ class LoginScreen extends Component<LoginProps, LoginState> {
                   name="phone"
                   onChangePhone={number =>
                     handleChange('phone')(number.replace(/\s/g, ''))
-                  }
+                  }                
                   onBlur={handleBlur('phone')}
                   value={values.phone}
                   errors={errors}

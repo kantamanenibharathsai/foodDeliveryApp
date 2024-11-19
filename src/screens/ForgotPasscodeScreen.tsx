@@ -7,25 +7,37 @@ import {
   View,
   Image,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
-import {responsiveHeight} from 'react-native-responsive-dimensions';
+import {
+  responsiveFontSize,
+  responsiveHeight,
+} from 'react-native-responsive-dimensions';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {
-  forgotPasscodeImg,
-  phoneIcon,
-  questionMarkImg,
-} from '../assets/index.ts';
-import CustomButton from '../components/Button.tsx';
-import {Formik, FormikHelpers} from 'formik';
+import {forgotPasscodeImg, phoneIcon, questionMarkImg} from '../assets/index';
+import CustomButton from '../components/Button';
+import {Formik} from 'formik';
 import * as Yup from 'yup';
-import KeyboardWrapper from '../components/KeyboardWrapper.tsx';
+import KeyboardWrapper from '../components/KeyboardWrapper';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  ApiStatusConstants,
+  sendOTPAction,
+  SendOTPReqInterface,
+} from '../redux/slices/AuthSlice';
+import {connect} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const validationSchema = Yup.object().shape({
   mobileNo: Yup.string()
-    .matches(/^[0-9]{9,10}$/, '*Invalid mobile number')
-    .required('*Mobile number is required'),
+    .matches(/^\d{10}$/, '* Phone number must be 10 digits')
+    .required('* Phone number is required')
+    .test('no-spaces', 'Phone Number cannot contain spaces', value => {
+      if (!value) return true;
+      return !value.includes(' ');
+    }),
 });
 
 interface FormValues {
@@ -36,8 +48,15 @@ interface ForgotPasscodeScreenState {
   initialValues: FormValues;
 }
 
-class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
-  constructor(props: {}) {
+interface Props {
+  sendOTPStatus: ApiStatusConstants;
+  sendOTPSuccessMsg: string;
+  sendOTPFailureMsg: string;
+  getOTPData: (data: SendOTPReqInterface) => void;
+}
+
+class ForgotPasscodeScreen extends Component<Props, ForgotPasscodeScreenState> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       initialValues: {
@@ -46,9 +65,14 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
     };
   }
 
-  handleSubmit = (values: FormValues, actions: FormikHelpers<FormValues>) => {
-    console.log(values);
-    actions.setSubmitting(false);
+  handleFormSubmit = async (values: FormValues) => {
+    const countryCode =
+      (await AsyncStorage.getItem('selectedCountryCode')) || '';
+    const forgotPasscodeData = {
+      mobile_no: values.mobileNo,
+      country_code: countryCode,
+    };
+    this.props.getOTPData(forgotPasscodeData);
   };
 
   render() {
@@ -70,7 +94,7 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
           <Formik
             initialValues={this.state.initialValues}
             validationSchema={validationSchema}
-            onSubmit={this.handleSubmit}>
+            onSubmit={(values: FormValues) => this.handleFormSubmit(values)}>
             {({
               handleChange,
               handleSubmit,
@@ -78,7 +102,6 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
               values,
               errors,
               touched,
-              isSubmitting,
             }) => (
               <View style={styles.topCont}>
                 <View>
@@ -86,18 +109,21 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
                     source={questionMarkImg}
                     style={styles.questionMarkImg}
                   />
-
                   <View style={styles.mobileNoCont}>
                     <Text style={styles.mobileNoTxt}>Mobile No</Text>
                     <View style={styles.inputWrapper}>
                       <TextInput
                         style={styles.input}
-                        placeholder="987654321"
+                        placeholder="9876543210"
                         placeholderTextColor={colors.greyColor}
-                        onChangeText={handleChange('mobileNo')}
                         onBlur={handleBlur('mobileNo')}
                         value={values.mobileNo}
                         keyboardType="numeric"
+                        maxLength={10}
+                        onChangeText={text => {
+                          const digitsOnly = text.replace(/[^0-9]/g, '');
+                          handleChange('mobileNo')(digitsOnly);
+                        }}
                       />
                       <Image source={phoneIcon} style={styles.inputIcon} />
                     </View>
@@ -106,11 +132,28 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
                     )}
                   </View>
                 </View>
-                <CustomButton
-                  title={'SEND OTP'}
-                  onPress={() => handleSubmit()}
-                  //   disabled={isSubmitting}
-                />
+                {this.props.sendOTPStatus === 'Initial' && (
+                  <CustomButton title={'SEND OTP'} onPress={handleSubmit} />
+                )}
+                {this.props.sendOTPStatus === 'Loading' && (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                  </View>
+                )}
+                {this.props.sendOTPStatus === 'Success' && (
+                  <>
+                    <CustomButton title={'SEND OTP'} onPress={handleSubmit} />
+                    <Text style={styles.succMsgAPI}>Login Successful</Text>
+                  </>
+                )}
+                {this.props.sendOTPStatus === 'Failed' && (
+                  <>
+                    <CustomButton title={'SEND OTP'} onPress={handleSubmit} />
+                    <Text style={styles.errMsgAPI}>
+                      {/* {this.props.loginErrMsg} */}
+                    </Text>
+                  </>
+                )}
               </View>
             )}
           </Formik>
@@ -120,7 +163,23 @@ class ForgotPasscodeScreen extends Component<{}, ForgotPasscodeScreenState> {
   }
 }
 
-export default ForgotPasscodeScreen;
+const mapStateToProps = (state: RootState) => {
+  console.log('mapStateToProps', state.auth.sendOTPSuccessMsg);
+  return {
+    sendOTPStatus: state.auth.sendOTPStatus,
+    sendOTPSuccessMsg: state.auth.sendOTPSuccessMsg,
+    sendOTPFailureMsg: state.auth.sendOTPFailureMsg,
+  };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  getOTPData: (data: SendOTPReqInterface) => dispatch(sendOTPAction(data)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ForgotPasscodeScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -201,5 +260,36 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: -15,
     fontFamily: fonts.bai.medium,
+  },
+
+  loadingContainer: {
+    width: 385,
+    height: 75,
+    alignSelf: 'center',
+    borderRadius: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    marginVertical: 10,
+    shadowColor: '#94CD00',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
+    elevation: 12,
+  },
+
+  succMsgAPI: {
+    color: colors.green,
+    fontSize: responsiveFontSize(1.5),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 1,
+  },
+  errMsgAPI: {
+    color: colors.red,
+    fontSize: responsiveFontSize(1.5),
+    fontFamily: fonts.montserrat.medium,
+    marginTop: 1,
   },
 });
