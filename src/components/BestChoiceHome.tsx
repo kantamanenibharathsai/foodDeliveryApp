@@ -1,48 +1,71 @@
 import {Component} from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
-import {bestChoiceBellIconImg, bestChoiceBurgerImg,} from '../assets';
+import {bestChoiceBellIconImg, bestChoiceBurgerImg} from '../assets';
 import {fonts} from '../constants/fonts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {colors} from '../utils/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
-import { BestChoiceHomeImgs } from '../utils/Data';
+import {
+  responsiveHeight,
+  responsiveWidth,
+} from 'react-native-responsive-dimensions';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  ApiStatusConstants,
+  bestChoiceAction,
+  BestChoicesObjectInterface,
+} from '../redux/slices/HomeSlice';
+import {connect} from 'react-redux';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 
+interface Props {
+  navigation?: NavigationProp<ParamListBase>;
+  bestChoiceStatus?: ApiStatusConstants;
+  bestChoiceSuccessData?: BestChoicesObjectInterface[];
+  bestChoiceErrMsg?: string;
+  getBestChoicesData?: () => void;
+}
 
-class BestChoiceHome extends Component {
+class BestChoiceHome extends Component<Props> {
+  componentDidMount(): void {
+    if (this.props.getBestChoicesData) this.props.getBestChoicesData();
+  }
 
-
-  renderItem = () => {
-    return(
-    <View style={styles.bestChoiceHomeCont}>
-      <View style={styles.bestChoiceFoodImgCont}>
-        <Image
-          source={bestChoiceBurgerImg}
-          style={styles.bestChoiceFoodImg}
-        />
-      </View>
-      <View style={styles.bodyCont}>
-        <Text style={styles.bestChoiceFoodText}>Burger</Text>
-        <View style={styles.rupeeCont}>
-          <FontAwesome name="rupee" color={colors.red} size={15} />
-          <Text style={styles.price}>90</Text>
+  renderItem = ({item: bestChoiceItem}: {item: BestChoicesObjectInterface}) => {
+    return (
+      <View style={styles.bestChoiceHomeCont}>
+        <View style={styles.bestChoiceFoodImgCont}>
+          <Image
+            source={bestChoiceBurgerImg}
+            style={styles.bestChoiceFoodImg}
+          />
         </View>
-
-        <Image source={bestChoiceBellIconImg} style={styles.bellIconImg} />
-        <Text style={styles.restaurantName}>Barbeque Nation</Text>
+        <View style={styles.bodyCont}>
+          <Text style={styles.bestChoiceFoodText}>
+            {bestChoiceItem.category}
+          </Text>
+          <View style={styles.rupeeCont}>
+            <FontAwesome name="rupee" color={colors.red} size={15} />
+            <Text style={styles.price}>{bestChoiceItem.price}</Text>
+          </View>
+          <Image source={bestChoiceBellIconImg} style={styles.bellIconImg} />
+          <Text style={styles.restaurantName}>
+            {bestChoiceItem.businessId.businessName}
+          </Text>
+        </View>
+        <View style={styles.whiteCircle}>
+          <AntDesign name="plus" size={25} />
+        </View>
       </View>
-      <View style={styles.whiteCircle}>
-        <AntDesign name="plus" size={25} />
-      </View>
-    </View>
-  )};
+    );
+  };
 
   render() {
     return (
       <FlatList
-        data={BestChoiceHomeImgs}
+        data={this.props.bestChoiceSuccessData}
         renderItem={this.renderItem}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item._id}
         horizontal
         contentContainerStyle={styles.flatList}
         showsHorizontalScrollIndicator={false}
@@ -51,7 +74,17 @@ class BestChoiceHome extends Component {
   }
 }
 
-export default BestChoiceHome;
+const mapStateToProps = (state: RootState) => ({
+  bestChoiceStatus: state.home.bestChoiceStatus,
+  bestChoiceSuccessData: state.home.bestChoiceSuccessData,
+  loginErrMsg: state.auth.loginErrMsg,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  getBestChoicesData: () => dispatch(bestChoiceAction()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(BestChoiceHome);
 
 const styles = StyleSheet.create({
   flatList: {

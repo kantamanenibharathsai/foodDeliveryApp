@@ -4,11 +4,11 @@ import {
   ImageBackground,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import {otpEmailImg, registerTopImg} from '../assets';
+import {registerTopImg} from '../assets';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
@@ -16,9 +16,17 @@ import {responsiveHeight} from 'react-native-responsive-dimensions';
 import {OtpInput} from 'react-native-otp-entry';
 import CustomButton from '../components/Button';
 import KeyboardWrapper from '../components/KeyboardWrapper';
-
-
-interface Props {}
+import {connect} from 'react-redux';
+import {
+  ApiStatusConstants,
+  updatePasswordAction,
+  UpdatePasswordReqInterface,
+} from '../redux/slices/AuthSlice';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {AppDispatch, RootState} from '../redux/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {DisplayPushNotification} from '../utils/PushNotification';
+import Toast from 'react-native-toast-message';
 
 interface State {
   inputs: {
@@ -30,6 +38,14 @@ interface State {
     confirmPasscode?: string;
   };
   isSubmitted: boolean;
+}
+
+interface Props {
+  updatePasswordStatus: ApiStatusConstants;
+  updatePasswordSuccessMsg: string;
+  updatePasswordFailureMsg: string;
+  updatePasswordAPIFunc: (data: UpdatePasswordReqInterface) => void;
+  navigation: NavigationProp<ParamListBase>;
 }
 
 class SetNewPasscodeScreen extends Component<Props, State> {
@@ -46,7 +62,6 @@ class SetNewPasscodeScreen extends Component<Props, State> {
   }
 
   handleInputChange = (field: keyof State['inputs'], value: string) => {
-    // console.log(field, value);
     if (value === '' && field === 'confirmPasscode') {
       this.setState(prevState => ({
         errors: {
@@ -67,7 +82,6 @@ class SetNewPasscodeScreen extends Component<Props, State> {
       }));
     } else if (value === '' && field === 'passcode') {
       this.setState(prevState => ({
-        
         errors: {
           ...prevState.errors,
           [field]: '*Passcode is required',
@@ -85,33 +99,26 @@ class SetNewPasscodeScreen extends Component<Props, State> {
         },
       }));
     } else {
-      console.log(this.state.inputs.passcode, value, "this.state.inputs.passcode.else.block");
-      this.setState(
-        prevState => ({
-          inputs: {
-            ...prevState.inputs,
-            [field]: value,
-          },
-          isSubmitted: false,
-        }),
-        () => {
-          // console.log('else', this.state.inputs.passcode, 'value', value);
+      this.setState(prevState => ({
+        inputs: {
+          ...prevState.inputs,
+          [field]: value,
         },
-      );
+        isSubmitted: false,
+      }));
     }
   };
 
   validateField = (field: keyof State['inputs']) => {
     const {passcode, confirmPasscode} = this.state.inputs;
-    // console.log("passocode", passcode, confirmPasscode)
     let errors: State['errors'] = {...this.state.errors};
     if (field === 'passcode') {
       if (passcode.length === 6) {
         errors.passcode = '';
       } else if (passcode.length === 0) {
-        errors.passcode = '*Passcode is required';
+        errors.passcode = '* Passcode is required';
       } else if (passcode.length !== 6) {
-        errors.passcode = '*Passcode must be exactly 6 characters';
+        errors.passcode = '* Passcode must be exactly 6 characters';
       } else {
         delete errors.passcode;
       }
@@ -120,14 +127,13 @@ class SetNewPasscodeScreen extends Component<Props, State> {
       if (confirmPasscode.length === 6) {
         errors.confirmPasscode = '';
       } else if (confirmPasscode.length === 0) {
-        errors.confirmPasscode = '*Confirm Passcode is required';
+        errors.confirmPasscode = '* Confirm Passcode is required';
       } else if (confirmPasscode !== passcode) {
-        errors.confirmPasscode = '*Passcodes must match';
+        errors.confirmPasscode = '* Passcodes must match';
       } else {
         delete errors.confirmPasscode;
       }
     }
-
     this.setState({errors});
   };
 
@@ -135,33 +141,59 @@ class SetNewPasscodeScreen extends Component<Props, State> {
     const {passcode, confirmPasscode} = this.state.inputs;
     let errors: State['errors'] = {};
     if (!passcode) {
-      errors.passcode = '*Passcode is required';
+      errors.passcode = '* Passcode is required';
     } else if (passcode.length !== 6) {
-      errors.passcode = '*Passcode must be exactly 6 characters';
+      errors.passcode = '* Passcode must be exactly 6 characters';
     }
     if (!confirmPasscode) {
-      errors.confirmPasscode = '*Confirm Passcode is required';
+      errors.confirmPasscode = '* Confirm Passcode is required';
     } else if (passcode.length !== 6) {
-      errors.passcode = '*Confirm Passcode must be exactly 6 characters';
+      errors.passcode = '* Confirm Passcode must be exactly 6 characters';
     } else if (confirmPasscode !== passcode) {
-      errors.confirmPasscode = '*Passcodes must match';
+      errors.confirmPasscode = '* Passcodes must match';
     }
     this.setState({errors});
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission
-  handleSubmit = () => {
-    // console.log(this.state.inputs.passcode, "this.state.inputs.Passcode");
+  handleSubmit = async () => {
     if (this.validateInputs()) {
-      this.setState({isSubmitted: true, errors: {}});
-      Alert.alert('Success', 'Passcode set successfully.');
-    }
-    else {
+      const registerAPIData = await AsyncStorage.getItem('registerAPIData');
+      const parsedData = registerAPIData ? JSON.parse(registerAPIData) : null;
+      if (parsedData) {
+        this.props.updatePasswordAPIFunc({
+          country_code: parsedData.selectedCountryCode,
+          mobile_no: parsedData.mobile_no,
+          newPassword: this.state.inputs.passcode,
+          confirmPassword: this.state.inputs.confirmPasscode,
+        });
+      }
+    } else {
       this.setState({isSubmitted: false, errors: {}});
       Alert.alert('Error', 'Please fill in all required fields correctly.');
     }
   };
+
+  componentDidUpdate(prevProps: Props) {
+    if (
+      prevProps.updatePasswordSuccessMsg !==
+        this.props.updatePasswordSuccessMsg &&
+      this.props.updatePasswordSuccessMsg !== ''
+    ) {
+      DisplayPushNotification(this.props.updatePasswordSuccessMsg);
+      this.props.navigation.navigate('LoginScreen');
+    } else if (
+      prevProps.updatePasswordFailureMsg !==
+        this.props.updatePasswordFailureMsg &&
+      this.props.updatePasswordFailureMsg !== ''
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: this.props.updatePasswordFailureMsg,
+      });
+    }
+  }
 
   render() {
     const {errors, isSubmitted} = this.state;
@@ -172,7 +204,8 @@ class SetNewPasscodeScreen extends Component<Props, State> {
           <View>
             <ImageBackground source={registerTopImg} style={styles.topImg}>
               <View style={styles.textCont}>
-                <TouchableOpacity onPress={() => console.log('Go Back')}>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}>
                   <Entypo
                     name="chevron-small-left"
                     style={styles.leftArrow}
@@ -190,9 +223,6 @@ class SetNewPasscodeScreen extends Component<Props, State> {
                   numberOfDigits={6}
                   focusColor="green"
                   secureTextEntry={false}
-                  // onFilled={(text: string) =>
-                  //   this.handleInputChange('passcode', text)
-                  // }
                   onTextChange={(text: string) => {
                     this.handleInputChange('passcode', text);
                   }}
@@ -216,9 +246,6 @@ class SetNewPasscodeScreen extends Component<Props, State> {
                   onTextChange={(text: string) => {
                     this.handleInputChange('confirmPasscode', text);
                   }}
-                  // onFilled={(text: string) =>
-                  //   this.handleInputChange('confirmPasscode', text)
-                  // }
                   onBlur={() => this.validateField('confirmPasscode')}
                   theme={{
                     containerStyle: styles.otpContainer,
@@ -232,14 +259,41 @@ class SetNewPasscodeScreen extends Component<Props, State> {
               </View>
             </View>
           </View>
-          <CustomButton title="SET PASSCODE" onPress={this.handleSubmit} />
+          {this.props.updatePasswordStatus === 'Initial' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleSubmit} />
+          )}
+          {this.props.updatePasswordStatus === 'Loading' && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            </View>
+          )}
+          {this.props.updatePasswordStatus === 'Success' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleSubmit} />
+          )}
+          {this.props.updatePasswordStatus === 'Failed' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleSubmit} />
+          )}
         </View>
       </KeyboardWrapper>
     );
   }
 }
 
-export default SetNewPasscodeScreen;
+const mapStateToProps = (state: RootState) => ({
+  updatePasswordStatus: state.auth.updatePasswordStatus,
+  updatePasswordSuccessMsg: state.auth.updatePasswordSuccessMsg,
+  updatePasswordFailureMsg: state.auth.updatePasswordFailureMsg,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  updatePasswordAPIFunc: (data: UpdatePasswordReqInterface) =>
+    dispatch(updatePasswordAction(data)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SetNewPasscodeScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -304,5 +358,22 @@ const styles = StyleSheet.create({
     color: colors.red,
     fontSize: 11,
     marginTop: 4,
+  },
+  loadingContainer: {
+    width: 385,
+    height: 75,
+    alignSelf: 'center',
+    borderRadius: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    marginVertical: 10,
+    shadowColor: '#94CD00',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
+    elevation: 12,
   },
 });

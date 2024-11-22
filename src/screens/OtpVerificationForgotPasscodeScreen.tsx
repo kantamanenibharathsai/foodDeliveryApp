@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   StatusBar,
@@ -14,71 +15,151 @@ import {
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import Toast from 'react-native-toast-message';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import KeyboardWrapper from '../components/KeyboardWrapper';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
-import {
-  otpBgImg,
-  otpEmailImg,
-  otpVerifiForgotPassBgImg,
-  resendIconImg,
-} from '../assets';
+import {otpEmailImg, otpVerifiForgotPassBgImg, resendIconImg} from '../assets';
 import CustomButton from '../components/Button';
 import {OtpInput} from 'react-native-otp-entry';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {
+  ApiStatusConstants,
+  sendOTPAction,
+  SendOTPReqInterface,
+  verifyOTPAction,
+  verifyOTPReqInterface,
+} from '../redux/slices/AuthSlice';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {AppDispatch, RootState} from '../redux/store';
+import {connect} from 'react-redux';
+import {DisplayPushNotification} from '../utils/PushNotification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface State {
+interface OtpVerificationState {
   otp: string;
+  otpValidation: string;
 }
 
-class OtpVerificationForgotPasscodeScreen extends Component<{}, State> {
-  state: State = {
-    otp: '',
-  };
+interface OtpVerificationProps {
+  sendOTPStatus: ApiStatusConstants;
+  sendOTPSuccessMsg: string;
+  sendOTPFailureMsg: string;
+  getOTPData: (data: SendOTPReqInterface) => void;
+  verifyOTPStatus: ApiStatusConstants;
+  verifyOTPSuccessMsg: string;
+  verifyOTPFailureMsg: string;
+  verifyOTPData: (data: verifyOTPReqInterface) => void;
+  navigation: NavigationProp<ParamListBase>;
+}
 
-  expectedOtp = '1234';
+class OtpVerificationForgotPasscodeScreen extends Component<
+  OtpVerificationProps,
+  OtpVerificationState
+> {
+  constructor(props: OtpVerificationProps) {
+    super(props);
+    this.state = {otp: '', otpValidation: ''};
+  }
 
   handleOtpChange = (text: string) => {
     this.setState({otp: text});
   };
 
+  retrieveProcessAndVerifyOTPData = async (otpType: string) => {
+    try {
+      const registerAPIData = await AsyncStorage.getItem('registerAPIData');
+      const parsedData = registerAPIData ? JSON.parse(registerAPIData) : null;
+      if (parsedData && otpType === 'reSendOTP') {
+        this.props.getOTPData({
+          mobile_no: parsedData.mobile_no,
+          country_code: parsedData.selectedCountryCode,
+        });
+        return;
+      } else if (parsedData && otpType === 'verifyOTP') {
+        this.props.verifyOTPData({
+          country_code: parsedData.selectedCountryCode,
+          mobile_no: parsedData.mobile_no,
+          otp: this.state.otp,
+        });
+        return;
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'An error occurred while retrieving OTP data.',
+      });
+      return;
+    }
+  };
+
+  async componentDidMount(): Promise<void> {
+    const forgotPasscode4DigitOTP = await AsyncStorage.getItem(
+      'forgotPasscode4DigitOTP',
+    );
+    if (forgotPasscode4DigitOTP)
+      DisplayPushNotification(forgotPasscode4DigitOTP);
+  }
+
+  resendOTP = () => {
+    this.retrieveProcessAndVerifyOTPData('reSendOTP');
+  };
+
   handleVerifyOtp = () => {
     const {otp} = this.state;
-
     if (otp.length === 0) {
       Toast.show({
         type: 'error',
         text1: 'Invalid OTP',
-        text2: 'Please enter the OTP.',
+        text2: 'Please enter the valid OTP.',
       });
       return;
-    }
-
-    if (otp.length !== 4) {
+    } else if (otp.length !== 4) {
       Toast.show({
         type: 'error',
         text1: 'Invalid OTP',
-        text2: 'OTP must be 4 digits long.',
+        text2: 'OTP must be 4 digits long',
       });
       return;
-    }
-
-    if (otp === this.expectedOtp) {
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'OTP Verified Successfully',
-      });
-      this.setState({otp: ''});
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid OTP',
-        text2: 'The OTP entered is incorrect.',
-      });
+      this.retrieveProcessAndVerifyOTPData('verifyOTP');
     }
   };
+
+  componentDidUpdate(prevProps: OtpVerificationProps) {
+    if (
+      prevProps.sendOTPSuccessMsg !== this.props.sendOTPSuccessMsg &&
+      this.props.sendOTPSuccessMsg !== ''
+    ) {
+      DisplayPushNotification(this.props.sendOTPSuccessMsg);
+    } else if (
+      prevProps.verifyOTPSuccessMsg !== this.props.verifyOTPSuccessMsg &&
+      this.props.verifyOTPSuccessMsg !== ''
+    ) {
+      DisplayPushNotification(this.props.verifyOTPSuccessMsg);
+      setTimeout(() => {
+        this.props.navigation.navigate('SetNewPasscodeScreen');
+      }, 2000);
+    } else if (
+      prevProps.sendOTPFailureMsg !== this.props.sendOTPFailureMsg &&
+      this.props.sendOTPFailureMsg !== ''
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: this.props.sendOTPFailureMsg,
+      });
+    } else if (
+      prevProps.verifyOTPFailureMsg !== this.props.verifyOTPFailureMsg &&
+      this.props.verifyOTPFailureMsg !== ''
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: this.props.verifyOTPFailureMsg,
+      });
+    }
+  }
 
   render() {
     const {otp} = this.state;
@@ -97,7 +178,8 @@ class OtpVerificationForgotPasscodeScreen extends Component<{}, State> {
               resizeMode="cover"
               style={styles.bgImageContainer}>
               <View style={styles.textCont}>
-                <TouchableOpacity onPress={() => console.log('Go Back')}>
+                <TouchableOpacity
+                  onPress={() => this.props.navigation.goBack()}>
                   <Entypo
                     name="chevron-small-left"
                     style={styles.leftArrow}
@@ -134,16 +216,29 @@ class OtpVerificationForgotPasscodeScreen extends Component<{}, State> {
                 </View>
                 <View style={styles.resendOtpContainer}>
                   <Text style={styles.resendText}>Resend OTP</Text>
-                  <TouchableOpacity style={styles.iconContainer}>
+                  <TouchableOpacity
+                    style={styles.iconContainer}
+                    onPress={this.resendOTP}>
                     <Image source={resendIconImg} width={44} height={44} />
                   </TouchableOpacity>
                 </View>
               </View>
             </ImageBackground>
           </View>
-          <View>
-            <CustomButton title={'VERIFY'} onPress={this.handleVerifyOtp} />
-          </View>
+          {this.props.verifyOTPStatus === 'Initial' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleVerifyOtp} />
+          )}
+          {this.props.verifyOTPStatus === 'Loading' && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            </View>
+          )}
+          {this.props.verifyOTPStatus === 'Success' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleVerifyOtp} />
+          )}
+          {this.props.verifyOTPStatus === 'Failed' && (
+            <CustomButton title={'SUBMIT'} onPress={this.handleVerifyOtp} />
+          )}
           <Toast />
         </View>
       </KeyboardWrapper>
@@ -151,18 +246,39 @@ class OtpVerificationForgotPasscodeScreen extends Component<{}, State> {
   }
 }
 
+const mapStateToProps = (state: RootState) => {
+  return {
+    sendOTPStatus: state.auth.sendOTPStatus,
+    sendOTPSuccessMsg: state.auth.sendOTPSuccessMsg,
+    sendOTPFailureMsg: state.auth.sendOTPFailureMsg,
+
+    verifyOTPStatus: state.auth.verifyOTPStatus,
+    verifyOTPSuccessMsg: state.auth.verifyOTPSuccessMsg,
+    verifyOTPFailureMsg: state.auth.verifyOTPFailureMsg,
+  };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  getOTPData: (data: SendOTPReqInterface) => dispatch(sendOTPAction(data)),
+  verifyOTPData: (data: verifyOTPReqInterface) =>
+    dispatch(verifyOTPAction(data)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(OtpVerificationForgotPasscodeScreen);
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
-    // height: '100%',
     flex: 1,
     justifyContent: 'space-between',
     gap: 15,
-    paddingBottom: responsiveHeight(3.5)
+    paddingBottom: responsiveHeight(3.5),
   },
 
   bgImageContainer: {
-    // flex: 1,
     height: responsiveHeight(59),
     paddingLeft: 10,
     paddingVertical: responsiveHeight(4.5),
@@ -196,6 +312,8 @@ const styles = StyleSheet.create({
     width: responsiveWidth(60),
     marginTop: 30,
     gap: 10,
+    alignSelf: 'center',
+    marginLeft: -15,
   },
 
   resendOtpContainer: {
@@ -278,6 +396,22 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.bai.medium,
   },
-});
 
-export default OtpVerificationForgotPasscodeScreen;
+  loadingContainer: {
+    width: 385,
+    height: 75,
+    alignSelf: 'center',
+    borderRadius: 60,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    marginVertical: 10,
+    shadowColor: '#94CD00',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
+    elevation: 12,
+  },
+});

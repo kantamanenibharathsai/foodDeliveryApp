@@ -5,20 +5,20 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   ListRenderItem,
   ImageSourcePropType,
-  Platform
+  Platform,
 } from 'react-native';
 import {dishImg, todaySpecialImg} from '../assets';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
-import { responsiveWidth } from 'react-native-responsive-dimensions';
 import {
   NavigationProp,
   RouteProp,
   ParamListBase,
 } from '@react-navigation/native';
+import {TodaysSpecialGetInterface} from '../redux/slices/HomeSlice';
+import {responsiveWidth} from 'react-native-responsive-dimensions';
 export interface FoodItem {
   id: string;
   name: string;
@@ -37,6 +37,7 @@ interface RootStackParamList extends ParamListBase {
 }
 
 interface TodaySpecialProps {
+  todaysSpecialGetSuccessData: TodaysSpecialGetInterface[];
 }
 interface TodaySpecialState {
   data: FoodItem[];
@@ -120,37 +121,39 @@ class TodaySpecial extends React.Component<
     };
   }
 
-  renderItem: ListRenderItem<FoodItem> = ({item}) => (
+  renderItem: ListRenderItem<TodaysSpecialGetInterface> = ({item}) => (
     <View style={styles.card}>
       <View style={styles.imgCont}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={todaySpecialImg} style={styles.image} />
       </View>
       <View style={styles.details}>
         <Text style={styles.name}>{item.name}</Text>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>{item.price}</Text>
-          <Text style={styles.originalPrice}>{item.originalPrice}</Text>
+          <Text style={styles.price}>₹{item.price}</Text>
+          <Text style={styles.originalPrice}>₹200</Text>
         </View>
         <View style={styles.imgTxtCont}>
           <Image source={dishImg} style={styles.imgStyle} />
-          <Text style={styles.restaurant}>{item.restaurant}</Text>
+          <Text style={styles.restaurant}>{item.category}</Text>
         </View>
       </View>
     </View>
   );
 
   render() {
-    const {data} = this.state;
-
-
     return (
       <FlatList
-        data={data}
-        keyExtractor={item => item.id}
+        data={this.props.todaysSpecialGetSuccessData}
+        keyExtractor={item => item._id}
         renderItem={this.renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flatList}
         nestedScrollEnabled
+        ListEmptyComponent={() => (
+          <View>
+            <Text>Data Not Found</Text>
+          </View>
+        )}
       />
     );
   }
@@ -160,7 +163,7 @@ export default TodaySpecial;
 
 const styles = StyleSheet.create({
   flatList: {
-    // padding: responsiveWidth(4),
+    paddingHorizontal: responsiveWidth(4),
     marginTop: -5,
   },
   card: {
@@ -186,8 +189,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   details: {
-    // borderWidth: 2,
-    // borderColor: "#000",
     marginLeft: 10,
     justifyContent: 'center',
     gap: 8,

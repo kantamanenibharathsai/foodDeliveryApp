@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import {restaurantNearByImg, todaySpecialImg} from '../assets';
+
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 import {
@@ -17,6 +18,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import RatingComponent from './RatingComponent';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {RestaurantNearByGetInterface} from '../redux/slices/HomeSlice';
 
 interface FoodItem {
   id: string;
@@ -72,6 +74,7 @@ const foodData: FoodItem[] = [
 
 interface RestaurantNearByProps {
   isRestNearByScreen: boolean;
+  restNearByGetSuccessData: RestaurantNearByGetInterface[];
 }
 interface RestaurantNearByState {
   data: FoodItem[];
@@ -88,19 +91,18 @@ class RestaurantNearBy extends React.Component<
     };
   }
 
-  renderItem = (item: any) => {
-    console.log(item, 'items');
+  renderItem = (item: RestaurantNearByGetInterface) => {
     return (
       <View style={styles.card}>
         <View style={styles.imgCont}>
           <Image source={restaurantNearByImg} style={styles.image} />
         </View>
         <View style={styles.details}>
-          <Text style={styles.name}>Golden Fish Restaurant</Text>
+          <Text style={styles.name}>{item.businessName}</Text>
           <View style={styles.kmsRatingCont}>
             <View style={styles.kmsCont}>
               <Entypo name="location-pin" size={16} color={colors.red} />
-              <Text style={styles.price}>2.5km</Text>
+              <Text style={styles.price}>{item.distance}km</Text>
             </View>
             <RatingComponent ratingNum={3} />
           </View>
@@ -114,17 +116,20 @@ class RestaurantNearBy extends React.Component<
 
   render() {
     const {data} = this.state;
+    console.log(
+      this.props.restNearByGetSuccessData,
+      'aaaagauayfgasuyfgauyfsgasufyg',
+    );
 
     return (
       <FlatList
-        data={data}
+        data={this.props.restNearByGetSuccessData}
         renderItem={({item}) => this.renderItem(item)}
         keyExtractor={(_, index) => index.toString()}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.flatList}
         horizontal={true}
         showsVerticalScrollIndicator={false}
-        
       />
     );
   }
@@ -220,3 +225,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
+

@@ -45,6 +45,9 @@ export interface AuthStateInterface {
   loginStatus: ApiStatusConstants;
   loginSuccessMsgToken: string;
   loginErrMsg: string;
+  updatePasswordStatus: ApiStatusConstants;
+  updatePasswordSuccessMsg: string;
+  updatePasswordFailureMsg: string;
 }
 
 const initialState: AuthStateInterface = {
@@ -60,6 +63,9 @@ const initialState: AuthStateInterface = {
   loginStatus: 'Initial',
   loginSuccessMsgToken: '',
   loginErrMsg: '',
+  updatePasswordStatus: 'Initial',
+  updatePasswordSuccessMsg: '',
+  updatePasswordFailureMsg: '',
 };
 
 interface RegisterSuccessAPIUser {
@@ -69,9 +75,15 @@ interface RegisterSuccessAPIUser {
   id: string;
 }
 
+export interface UpdatePasswordReqInterface {
+  country_code: string;
+  mobile_no: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 const setRegisterAPIData = async (apiData: RegisterSuccessAPIUser) => {
   const selectedCountryCode = await AsyncStorage.getItem('selectedCountryCode');
-  console.log('setRegisterAPIData', apiData, selectedCountryCode);
   await AsyncStorage.setItem(
     'registerAPIData',
     JSON.stringify({...apiData, selectedCountryCode}),
@@ -89,14 +101,14 @@ export const registerAction = createAsyncThunk(
         },
         body: JSON.stringify(payload),
       };
-      console.log('registering ', payload);
+
       const response = await fetch(`${baseURL}/${endPoints.SIGNUP}`, options);
       if (!response.ok) {
         const errorData = await response.json();
         return rejectWithValue(errorData.error.error || 'An error occurred');
       }
       const result = await response.json();
-      console.log('result', result);
+
       setRegisterAPIData(result.user);
       return result;
     } catch (err) {
@@ -116,15 +128,13 @@ export const sendOTPAction = createAsyncThunk(
         },
         body: JSON.stringify(payload),
       };
-      console.log('sendOTPActionPayload', payload);
       const response = await fetch(`${baseURL}/${endPoints.SEND_OTP}`, options);
-      // console.log("responseobj", await response.json());
+
       if (!response.ok) {
         const errorData = await response.json();
         return rejectWithValue(errorData.error.error || 'An error occurred');
       }
       const sendOtpData = await response.json();
-      console.log('sendOTPSuccess', sendOtpData);
       return sendOtpData;
     } catch (error) {
       return rejectWithValue('Network request failed');
@@ -143,7 +153,7 @@ export const verifyOTPAction = createAsyncThunk(
         },
         body: JSON.stringify(payload),
       };
-      console.log('verifyOTPActionPayload', payload);
+
       const response = await fetch(
         `${baseURL}/${endPoints.VERIFY_OTP}`,
         options,
@@ -153,7 +163,7 @@ export const verifyOTPAction = createAsyncThunk(
         return rejectWithValue(errorData.error.error || 'An error occurred');
       }
       const verifyOtpData = await response.json();
-      console.log('verifyOTPSuccess', verifyOtpData);
+
       return verifyOtpData;
     } catch (error) {
       return rejectWithValue('Network request failed');
@@ -172,7 +182,7 @@ export const loginAction = createAsyncThunk(
         },
         body: JSON.stringify(payload),
       };
-      console.log('loginActionPayload', payload);
+
       const response = await fetch(`${baseURL}/${endPoints.LOGIN}`, options);
       if (!response.ok) {
         const errorData = await response.json();
@@ -181,8 +191,35 @@ export const loginAction = createAsyncThunk(
       const loginData = await response.json();
       if (loginData?.data?.jwtToken)
         await AsyncStorage.setItem('jwtToken', loginData?.data?.jwtToken);
-      console.log('loginSuccess', loginData);
+ 
       return loginData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
+
+export const updatePasswordAction = createAsyncThunk(
+  'updatePasswordAction',
+  async (payload: UpdatePasswordReqInterface, {rejectWithValue}) => {
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+      const response = await fetch(
+        `${baseURL}/${endPoints.UPDATE_PASSWORD}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const updatePasswordData = await response.json();
+      return updatePasswordData;
     } catch (error) {
       return rejectWithValue('Network request failed');
     }
@@ -200,13 +237,13 @@ const AuthSlice = createSlice({
       state.registerErrMsg = '';
     });
     builder.addCase(registerAction.fulfilled, (state, action) => {
-      console.log('action.payload', action.payload);
+
       state.registerStatus = 'Success';
       state.registerSuccessMsg = 'User Registered Successfully';
       state.registerErrMsg = '';
     });
     builder.addCase(registerAction.rejected, (state, action) => {
-      console.log('rejected');
+
       state.registerStatus = 'Failed';
       state.registerSuccessMsg = '';
       state.registerErrMsg = action.payload as string;
@@ -218,7 +255,7 @@ const AuthSlice = createSlice({
       state.sendOTPFailureMsg = '';
     });
     builder.addCase(sendOTPAction.fulfilled, (state, action) => {
-      console.log('action.payloadONE', action.payload.data);
+
       state.sendOTPStatus = 'Success';
       state.sendOTPSuccessMsg = action.payload.data?.otp || '';
       state.sendOTPFailureMsg = '';
@@ -235,7 +272,7 @@ const AuthSlice = createSlice({
       state.verifyOTPFailureMsg = '';
     });
     builder.addCase(verifyOTPAction.fulfilled, (state, action) => {
-      console.log('action.payloadTWO', action.payload.data);
+
       state.verifyOTPStatus = 'Success';
       state.verifyOTPSuccessMsg = action.payload.data?.message || '';
       state.verifyOTPFailureMsg = '';
@@ -252,7 +289,7 @@ const AuthSlice = createSlice({
       state.loginErrMsg = '';
     });
     builder.addCase(loginAction.fulfilled, (state, action) => {
-      console.log('action.payloadThree', action.payload.data);
+
       state.loginStatus = 'Success';
       state.loginSuccessMsgToken = action.payload.data?.jwtToken || '';
       state.loginErrMsg = '';
@@ -261,6 +298,22 @@ const AuthSlice = createSlice({
       state.loginStatus = 'Failed';
       state.loginSuccessMsgToken = '';
       state.loginErrMsg = action.payload as string;
+    });
+
+    builder.addCase(updatePasswordAction.pending, state => {
+      state.updatePasswordStatus = 'Loading';
+      state.updatePasswordSuccessMsg = '';
+      state.updatePasswordFailureMsg = '';
+    });
+    builder.addCase(updatePasswordAction.fulfilled, (state, action) => {
+      state.updatePasswordStatus = 'Success';
+      state.updatePasswordSuccessMsg = action.payload.data.message;
+      state.updatePasswordFailureMsg = '';
+    });
+    builder.addCase(updatePasswordAction.rejected, (state, action) => {
+      state.updatePasswordStatus = 'Failed';
+      state.updatePasswordSuccessMsg = '';
+      state.updatePasswordFailureMsg = '';
     });
   },
 });

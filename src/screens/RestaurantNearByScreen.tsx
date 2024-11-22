@@ -5,15 +5,31 @@ import {colors} from '../utils/Colors';
 import Entypo from 'react-native-vector-icons/Entypo';
 import RestaurantNearByScreenVertical from '../components/RestuarantNearByScreenVertical';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {ApiStatusConstants} from '../redux/slices/AuthSlice';
+import {
+  RestaurantNearByGetInterface,
+  restNearByGetGetAction,
+} from '../redux/slices/HomeSlice';
+import {AppDispatch, RootState} from '../redux/store';
+import {connect} from 'react-redux';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  restNearByGetStatus: ApiStatusConstants;
+  restNearByGetSuccessData: RestaurantNearByGetInterface[];
+  restNearByGetErrData: string;
+  restNearByGetDataFunc: () => void;
 }
 
 class RestaurantNearByScreen extends Component<Props> {
   handleGoBack = () => {
     this.props.navigation.goBack();
   };
+
+  componentDidMount(): void {
+    this.props.restNearByGetDataFunc();
+  }
+
   render() {
     return (
       <View style={styles.restNearByCont}>
@@ -23,13 +39,30 @@ class RestaurantNearByScreen extends Component<Props> {
           </TouchableOpacity>
           <Text style={styles.restNearByText}>Restaurant Nearby</Text>
         </View>
-        <RestaurantNearByScreenVertical />
+        <RestaurantNearByScreenVertical
+          restNearByGetSuccessData={this.props.restNearByGetSuccessData}
+        />
       </View>
     );
   }
 }
 
-export default RestaurantNearByScreen;
+const mapStateToProps = (state: RootState) => ({
+  restNearByGetStatus: state.home.restNearByGetStatus,
+  restNearByGetSuccessData: state.home.restNearByGetSuccessData,
+  restNearByGetErrData: state.home.restNearByGetErrData,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    restNearByGetDataFunc: () => dispatch(restNearByGetGetAction()),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(RestaurantNearByScreen);
 
 const styles = StyleSheet.create({
   restNearByCont: {

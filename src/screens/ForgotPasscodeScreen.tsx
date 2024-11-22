@@ -29,6 +29,8 @@ import {
 } from '../redux/slices/AuthSlice';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {DisplayPushNotification} from '../utils/PushNotification';
 
 const validationSchema = Yup.object().shape({
   mobileNo: Yup.string()
@@ -53,6 +55,7 @@ interface Props {
   sendOTPSuccessMsg: string;
   sendOTPFailureMsg: string;
   getOTPData: (data: SendOTPReqInterface) => void;
+  navigation: NavigationProp<ParamListBase>;
 }
 
 class ForgotPasscodeScreen extends Component<Props, ForgotPasscodeScreenState> {
@@ -75,13 +78,23 @@ class ForgotPasscodeScreen extends Component<Props, ForgotPasscodeScreenState> {
     this.props.getOTPData(forgotPasscodeData);
   };
 
+  async componentDidUpdate(prevProps: Props) {
+    if (prevProps.sendOTPSuccessMsg !== this.props.sendOTPSuccessMsg) {
+      const {sendOTPSuccessMsg} = this.props;
+      await AsyncStorage.setItem('forgotPasscode4DigitOTP', sendOTPSuccessMsg);
+      this.props.navigation.navigate('OtpVerificationForgotPasscodeScreen');
+    } else if (prevProps.sendOTPFailureMsg !== this.props.sendOTPFailureMsg) {
+      DisplayPushNotification(this.props.sendOTPFailureMsg);
+    }
+  }
+
   render() {
     return (
       <KeyboardWrapper>
         <View style={styles.container}>
           <ImageBackground source={forgotPasscodeImg} style={styles.topImg}>
             <View style={styles.textCont}>
-              <TouchableOpacity onPress={() => console.log('Go Back')}>
+              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
                 <Entypo
                   name="chevron-small-left"
                   style={styles.leftArrow}
@@ -143,15 +156,11 @@ class ForgotPasscodeScreen extends Component<Props, ForgotPasscodeScreenState> {
                 {this.props.sendOTPStatus === 'Success' && (
                   <>
                     <CustomButton title={'SEND OTP'} onPress={handleSubmit} />
-                    <Text style={styles.succMsgAPI}>Login Successful</Text>
                   </>
                 )}
                 {this.props.sendOTPStatus === 'Failed' && (
                   <>
                     <CustomButton title={'SEND OTP'} onPress={handleSubmit} />
-                    <Text style={styles.errMsgAPI}>
-                      {/* {this.props.loginErrMsg} */}
-                    </Text>
                   </>
                 )}
               </View>
@@ -164,7 +173,6 @@ class ForgotPasscodeScreen extends Component<Props, ForgotPasscodeScreenState> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  console.log('mapStateToProps', state.auth.sendOTPSuccessMsg);
   return {
     sendOTPStatus: state.auth.sendOTPStatus,
     sendOTPSuccessMsg: state.auth.sendOTPSuccessMsg,

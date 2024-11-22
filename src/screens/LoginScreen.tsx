@@ -74,7 +74,7 @@ class LoginScreen extends Component<LoginProps, LoginState> {
       prevProps.loginStatus !== this.props.loginStatus &&
       this.props.loginStatus === 'Success'
     ) {
-      this.props.navigation.navigate('BottomTab');
+      this.props.navigation.navigate('AllowLocationScreen');
     }
   }
 
@@ -138,7 +138,7 @@ class LoginScreen extends Component<LoginProps, LoginState> {
                   name="phone"
                   onChangePhone={number =>
                     handleChange('phone')(number.replace(/\s/g, ''))
-                  }                
+                  }
                   onBlur={handleBlur('phone')}
                   value={values.phone}
                   errors={errors}
@@ -356,7 +356,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
   },
-
   loadingContainer: {
     width: 385,
     height: 75,

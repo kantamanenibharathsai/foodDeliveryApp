@@ -25,9 +25,33 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import TodaySpecial from '../components/TodaySpecial';
 import RestaurantNearBy from '../components/RestaurantNearBy';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {AppDispatch, RootState} from '../redux/store';
+import {
+  ApiStatusConstants,
+  bestChoiceAction,
+  BestChoicesObjectInterface,
+  RestaurantNearByGetInterface,
+  restNearByGetGetAction,
+  todaysSpecialGetAction,
+  TodaysSpecialGetInterface,
+} from '../redux/slices/HomeSlice';
+import {connect} from 'react-redux';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  bestChoiceStatus: ApiStatusConstants;
+  bestChoiceSuccessData: BestChoicesObjectInterface[];
+  bestChoiceErrMsg: string;
+
+  todaysSpecialGetStatus: ApiStatusConstants;
+  todaysSpecialGetSuccessData: TodaysSpecialGetInterface[];
+  todaysSpecialGetErrData: string;
+  todaysSpecialGetDataFunc: () => void;
+
+  restNearByGetStatus: ApiStatusConstants;
+  restNearByGetSuccessData: RestaurantNearByGetInterface[];
+  restNearByGetErrData: string;
+  restNearByGetDataFunc: () => void;
 }
 class HomeScreen extends Component<Props> {
   mapHandler = () => {
@@ -38,7 +62,13 @@ class HomeScreen extends Component<Props> {
     this.props.navigation.navigate('TodaySpecialScreen');
   };
 
+  componentDidMount(): void {
+    this.props.todaysSpecialGetDataFunc();
+    this.props.restNearByGetDataFunc();
+  }
+
   render() {
+
     return (
       <ScrollView style={styles.container}>
         <View style={styles.cont}>
@@ -85,18 +115,24 @@ class HomeScreen extends Component<Props> {
             <BestChoiceHome />
           </View>
 
-          <View style={styles.todaySpecialCont}>
-            <View style={styles.todaySpecialTopCont}>
-              <Text style={styles.commonTxt}>Today Special</Text>
-              <TouchableOpacity
-                onPress={this.viewAllHandler}
-                style={styles.navigateBtn}>
-                <Text style={styles.viewAllTxt}>View All</Text>
-                <AntDesign name="arrowright" size={19} color={colors.green} />
-              </TouchableOpacity>
+          {this.props.todaysSpecialGetSuccessData?.length !== 0 && (
+            <View style={styles.todaySpecialCont}>
+              <View style={styles.todaySpecialTopCont}>
+                <Text style={styles.commonTxt}>Today Special</Text>
+                <TouchableOpacity
+                  onPress={this.viewAllHandler}
+                  style={styles.navigateBtn}>
+                  <Text style={styles.viewAllTxt}>View All</Text>
+                  <AntDesign name="arrowright" size={19} color={colors.green} />
+                </TouchableOpacity>
+              </View>
+              <TodaySpecial
+                todaysSpecialGetSuccessData={
+                  this.props.todaysSpecialGetSuccessData
+                }
+              />
             </View>
-            <TodaySpecial />
-          </View>
+          )}
           <View style={styles.todaySpecialCont}>
             <View style={styles.todaySpecialTopCont}>
               <Text style={styles.commonTxt}>Restaurant Nearby</Text>
@@ -111,11 +147,34 @@ class HomeScreen extends Component<Props> {
             </View>
           </View>
         </View>
-        <RestaurantNearBy isRestNearByScreen={false} />
+        <RestaurantNearBy isRestNearByScreen={false} restNearByGetSuccessData={this.props.restNearByGetSuccessData}/>
       </ScrollView>
     );
   }
 }
+
+const mapStateToProps = (state: RootState) => ({
+  bestChoiceStatus: state.home.bestChoiceStatus,
+  bestChoiceSuccessData: state.home.bestChoiceSuccessData,
+  loginErrMsg: state.auth.loginErrMsg,
+
+  todaysSpecialGetStatus: state.home.todaysSpecialGetStatus,
+  todaysSpecialGetSuccessData: state.home.todaysSpecialGetSuccessData,
+  todaysSpecialGetErrData: state.home.todaysSpecialGetErrData,
+
+  restNearByGetStatus: state.home.restNearByGetStatus,
+  restNearByGetSuccessData: state.home.restNearByGetSuccessData,
+  restNearByGetErrData: state.home.restNearByGetErrData
+
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    getBestChoicesData: () => dispatch(bestChoiceAction()),
+    todaysSpecialGetDataFunc: () => dispatch(todaysSpecialGetAction()),
+    restNearByGetDataFunc : () => dispatch(restNearByGetGetAction())
+  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -272,4 +331,4 @@ const styles = StyleSheet.create({
   navigateBtn: {flexDirection: 'row', alignItems: 'center', gap: 10},
 });
 
-export default HomeScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

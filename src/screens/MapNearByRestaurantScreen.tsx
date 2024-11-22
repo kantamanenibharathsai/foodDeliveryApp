@@ -3,7 +3,6 @@ import {
   Alert,
   FlatList,
   Image,
-  ImageSourcePropType,
   PermissionsAndroid,
   Platform,
   StatusBar,
@@ -12,7 +11,6 @@ import {
   View,
   Text,
 } from 'react-native';
-
 import Geolocation, {GeoPosition} from 'react-native-geolocation-service';
 import MapView, {Marker, PROVIDER_DEFAULT, Region} from 'react-native-maps';
 import {
@@ -30,8 +28,6 @@ import {colors} from '../utils/Colors';
 import RatingComponent from '../components/RatingComponent';
 import {foodHomeImages} from '../utils/Data';
 import {foodData, FoodItem} from '../components/SearchHydComponentScreen';
-
-
 
 interface Props {
   loading: boolean;
@@ -68,7 +64,6 @@ class MapNearByRestaurant extends React.Component<Props, State> {
       latitude: currPosition ? currPosition.coords.latitude : 0,
       longitude: currPosition ? currPosition.coords.longitude : 0,
     };
-
   }
 
   requestLocationPermission = async (): Promise<boolean> => {
@@ -221,7 +216,8 @@ const styles = StyleSheet.create({
   },
   mapStyles: {
     width: '100%',
-    height: Platform.OS === "android" ? responsiveHeight(68) : responsiveHeight(64),
+    height:
+      Platform.OS === 'android' ? responsiveHeight(68) : responsiveHeight(64),
   },
   topContainer: {
     position: 'absolute',

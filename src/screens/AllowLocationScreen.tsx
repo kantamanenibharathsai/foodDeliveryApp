@@ -81,18 +81,20 @@ class AllowLocationScreen extends Component<AllowLocationScreenProps, State> {
   };
 
   handleAllowLocation = async (): Promise<void> => {
+    console.log("allow");
     try {
       const hasPermission = await this.requestLocationPermission();
-      if (!hasPermission) {
-        this.openSettings();
-        return;
-      }
+      // if (!hasPermission) {
+      //   this.openSettings();
+      //   return;
+      // }
       this.setState({loading: true});
+         console.log('allow2');
       Geolocation.getCurrentPosition(
         async position => {
           const {latitude, longitude} = position.coords;
           const coordinates = {latitude, longitude};
-          console.log(coordinates);
+          // console.log(coordinates);
           await AsyncStorage.setItem(
             'coordinates',
             JSON.stringify(coordinates),
@@ -100,7 +102,7 @@ class AllowLocationScreen extends Component<AllowLocationScreenProps, State> {
           this.setState({latitude, longitude});
 
           setTimeout(() => {
-            this.setState({loading: false}); 
+            this.setState({loading: false});
             this.props.navigation.navigate('BottomTab');
           }, 3000);
         },

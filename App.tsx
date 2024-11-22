@@ -52,7 +52,7 @@ const App = () => {
         />
         <Stack.Navigator
           screenOptions={{headerShown: false}}
-          initialRouteName="ForgotPasscodeScreen">
+          initialRouteName="LoginScreen">
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
