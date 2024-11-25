@@ -5,100 +5,67 @@ import {
   StyleSheet,
   Text,
   View,
-  ImageSourcePropType,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
-import {restaurantNearByImg, todaySpecialImg} from '../assets';
+import {restaurantNearByImg} from '../assets';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 import {
+  responsiveFontSize,
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import RatingComponent from './RatingComponent';
 import Entypo from 'react-native-vector-icons/Entypo';
-
-interface FoodItem {
-  id: string;
-  name: string;
-  price: string;
-  originalPrice: string;
-  restaurant: string;
-  image: ImageSourcePropType;
-}
-
-const foodData: FoodItem[] = [
-  {
-    id: '1',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '2',
-    name: 'Chicken Tikka',
-    price: '₹80',
-    originalPrice: '₹120',
-    restaurant: 'Barbeque Nation',
-    image: todaySpecialImg,
-  },
-  {
-    id: '3',
-    name: 'Pizza',
-    price: '₹90',
-    originalPrice: '₹140',
-    restaurant: 'Naivedhyam Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '4',
-    name: 'Chicken Biryani',
-    price: '₹60',
-    originalPrice: '₹80',
-    restaurant: 'Saoji Bhojnalaya',
-    image: todaySpecialImg,
-  },
-  {
-    id: '5',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-];
+import {
+  ApiStatusConstants,
+  RestaurantNearByGetInterface,
+  restNearByGetGetAction,
+} from '../redux/slices/HomeSlice';
+import {AppDispatch, RootState} from '../redux/store';
+import {connect} from 'react-redux';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
 
 interface RestaurantNearByProps {
+  navigation?: NavigationProp<ParamListBase>;
+  restNearByGetStatus?: ApiStatusConstants;
+  restNearByGetSuccessData?: RestaurantNearByGetInterface[];
+  restNearByGetErrData?: string;
+  restNearByGetDataFunc?: () => void;
 }
-interface RestaurantNearByState {
-  data: FoodItem[];
-}
-
 class RestaurantNearByScreenVertical extends React.Component<
   RestaurantNearByProps,
-  RestaurantNearByState
+  {hasCalledApi: boolean}
 > {
   constructor(props: RestaurantNearByProps) {
     super(props);
     this.state = {
-      data: foodData,
+      hasCalledApi: false,
     };
   }
 
-  renderItem = (item: any) => {
+  componentDidMount(): void {
+    setTimeout(() => {
+      if (!this.state.hasCalledApi) {
+        const {restNearByGetDataFunc = () => {}} = this.props;
+        restNearByGetDataFunc();
+        this.setState({hasCalledApi: true});
+      }
+    }, 3000);
+  }
+  renderItem = (item: RestaurantNearByGetInterface) => {
     return (
       <View style={styles.card}>
         <View style={styles.imgCont}>
           <Image source={restaurantNearByImg} style={styles.image} />
         </View>
         <View style={styles.details}>
-          <Text style={styles.name}>Golden Fish Restaurant</Text>
+          <Text style={styles.name}>{item.businessName}</Text>
           <View style={styles.kmsRatingCont}>
             <View style={styles.kmsCont}>
               <Entypo name="location-pin" size={16} color={colors.red} />
-              <Text style={styles.price}>2.5km</Text>
+              <Text style={styles.price}>{item.distance}km</Text>
             </View>
             <RatingComponent ratingNum={3} />
           </View>
@@ -111,30 +78,60 @@ class RestaurantNearByScreenVertical extends React.Component<
   };
 
   render() {
-    const {data} = this.state;
+    const {restNearByGetStatus, restNearByGetSuccessData} = this.props;
+
+    if (restNearByGetStatus === 'Loading') {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.red} />
+        </View>
+      );
+    }
 
     return (
       <FlatList
-        data={data}
+        data={restNearByGetSuccessData}
         renderItem={({item}) => this.renderItem(item)}
         keyExtractor={(_, index) => index.toString()}
-        // showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.flatList}
-        // horizontal={false}
-        // showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => {
+          if (restNearByGetStatus === 'Failed') {
+            return (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>
+                  Failed to load restaurants.
+                </Text>
+              </View>
+            );
+          }
+        }}
       />
     );
   }
 }
 
-export default RestaurantNearByScreenVertical;
+const mapStateToProps = (state: RootState) => ({
+  restNearByGetStatus: state.home.restNearByGetStatus,
+  restNearByGetSuccessData: state.home.restNearByGetSuccessData,
+  restNearByGetErrData: state.home.restNearByGetErrData,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  restNearByGetDataFunc: () => dispatch(restNearByGetGetAction()),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(RestaurantNearByScreenVertical);
 
 const styles = StyleSheet.create({
   flatList: {
     paddingHorizontal: responsiveWidth(4),
     gap: 16,
     marginVertical: responsiveHeight(1.7),
-    paddingBottom: responsiveHeight(4)
+    paddingBottom: responsiveHeight(4),
   },
   card: {
     backgroundColor: '#fff',
@@ -145,8 +142,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 3,
     shadowRadius: 15,
     elevation: 8,
-    // width: 296,
-    // height: 270,
   },
   imgCont: {
     width: '100%',
@@ -214,5 +209,23 @@ const styles = StyleSheet.create({
     color: colors.lightTextColor,
     fontFamily: fonts.montserrat.medium,
     lineHeight: 20,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+  },
+  errorText: {
+    fontSize: responsiveFontSize(1.7),
+    color: colors.red,
+    fontFamily: fonts.bai.medium,
   },
 });

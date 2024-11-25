@@ -15,20 +15,12 @@ import {connect} from 'react-redux';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
-  restNearByGetStatus: ApiStatusConstants;
-  restNearByGetSuccessData: RestaurantNearByGetInterface[];
-  restNearByGetErrData: string;
-  restNearByGetDataFunc: () => void;
 }
 
 class RestaurantNearByScreen extends Component<Props> {
   handleGoBack = () => {
     this.props.navigation.goBack();
   };
-
-  componentDidMount(): void {
-    this.props.restNearByGetDataFunc();
-  }
 
   render() {
     return (
@@ -39,30 +31,15 @@ class RestaurantNearByScreen extends Component<Props> {
           </TouchableOpacity>
           <Text style={styles.restNearByText}>Restaurant Nearby</Text>
         </View>
-        <RestaurantNearByScreenVertical
-          restNearByGetSuccessData={this.props.restNearByGetSuccessData}
-        />
+        <RestaurantNearByScreenVertical />
       </View>
     );
   }
 }
 
-const mapStateToProps = (state: RootState) => ({
-  restNearByGetStatus: state.home.restNearByGetStatus,
-  restNearByGetSuccessData: state.home.restNearByGetSuccessData,
-  restNearByGetErrData: state.home.restNearByGetErrData,
-});
 
-const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {
-    restNearByGetDataFunc: () => dispatch(restNearByGetGetAction()),
-  };
-};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(RestaurantNearByScreen);
+export default RestaurantNearByScreen;
 
 const styles = StyleSheet.create({
   restNearByCont: {

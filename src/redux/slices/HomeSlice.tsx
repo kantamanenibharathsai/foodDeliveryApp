@@ -97,6 +97,55 @@ export interface HomeStateInterface {
   restNearByGetStatus: ApiStatusConstants;
   restNearByGetSuccessData: RestaurantNearByGetInterface[];
   restNearByGetErrData: string;
+  bestChoiceNearByRestStatus: ApiStatusConstants;
+  bestChoiceNearByRestSuccessData: BestChoiceNearByRestProductInterface[];
+  bestChoiceNearByRestErrData: '';
+}
+
+export interface TodaysSpecialNearByRestProductInterface {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  categoryId: string;
+  images: string[];
+  subCategory: string | null;
+  price: number;
+  quantity: number;
+  units: string;
+  businessId: string;
+  discountPrice: number;
+  weight: number;
+  isActive: boolean;
+  packingCharge: number;
+  isTodaySpecial: boolean;
+  specialDayDate: string | null;
+  isBestChoice: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BestChoiceNearByRestProductInterface {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  categoryId: string;
+  images: string[];
+  subCategory: string | null;
+  price: number;
+  quantity: number;
+  units: string;
+  businessId: string;
+  discountPrice: number;
+  weight: number;
+  isActive: boolean;
+  packingCharge: number;
+  isTodaySpecial: boolean;
+  specialDayDate: string | null;
+  isBestChoice: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const initialState: HomeStateInterface = {
@@ -109,6 +158,9 @@ export const initialState: HomeStateInterface = {
   restNearByGetStatus: 'Initial',
   restNearByGetSuccessData: [],
   restNearByGetErrData: '',
+  bestChoiceNearByRestStatus: 'Initial',
+  bestChoiceNearByRestSuccessData: [],
+  bestChoiceNearByRestErrData: '',
 };
 
 export const bestChoiceAction = createAsyncThunk(
@@ -188,7 +240,7 @@ export const restNearByGetGetAction = createAsyncThunk(
         latitude = parsedCoordinates.latitude;
         longitude = parsedCoordinates.longitude;
       }
-          // `${baseURL}/${endPoints.REST_NEARBY}/?lat=${latitude}&long=${longitude}`,
+      // `${baseURL}/${endPoints.REST_NEARBY}/?lat=${latitude}&long=${longitude}`,
       const response = await fetch(
         `${baseURL}/${endPoints.REST_NEARBY}/?lat=17.4485833&long=78.3908033`,
         options,
@@ -200,6 +252,34 @@ export const restNearByGetGetAction = createAsyncThunk(
       const restNearByData = await response.json();
       // console.log("restNearByData", restNearByData);
       return restNearByData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
+
+export const bestChoiceNearByRestAction = createAsyncThunk(
+  'bestChoiceNearByRestAction',
+  async (_, {rejectWithValue}) => {
+    try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: jwtToken || '',
+        },
+      };
+      const response = await fetch(
+        `${baseURL}/${endPoints.BEST_CHOICES_NEARBY_REST}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const bestChoiceData = await response.json();
+      return bestChoiceData;
     } catch (error) {
       return rejectWithValue('Network request failed');
     }
@@ -257,6 +337,22 @@ const HomeSlice = createSlice({
       state.restNearByGetStatus = 'Failed';
       state.restNearByGetSuccessData = [];
       state.restNearByGetErrData = '';
+    });
+
+    builder.addCase(bestChoiceNearByRestAction.pending, state => {
+      state.bestChoiceNearByRestStatus = 'Loading';
+      state.bestChoiceNearByRestSuccessData = [];
+      state.bestChoiceNearByRestErrData = '';
+    });
+    builder.addCase(bestChoiceNearByRestAction.fulfilled, (state, action) => {
+      state.bestChoiceNearByRestStatus = 'Success';
+      state.bestChoiceNearByRestSuccessData = action.payload;
+      state.bestChoiceNearByRestErrData = '';
+    });
+    builder.addCase(bestChoiceNearByRestAction.rejected, (state, action) => {
+      state.bestChoiceNearByRestStatus = 'Failed';
+      state.bestChoiceNearByRestSuccessData = [];
+      state.bestChoiceNearByRestErrData = '';
     });
   },
 });

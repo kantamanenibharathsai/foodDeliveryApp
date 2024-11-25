@@ -112,7 +112,7 @@ class HomeScreen extends Component<Props> {
           <HomeCarousal />
           <View style={styles.bestChoiceContainer}>
             <Text style={styles.commonTxt}>Best Choice</Text>
-            <BestChoiceHome />
+            <BestChoiceHome navigation={this.props.navigation} />
           </View>
 
           {this.props.todaysSpecialGetSuccessData?.length !== 0 && (
@@ -147,7 +147,10 @@ class HomeScreen extends Component<Props> {
             </View>
           </View>
         </View>
-        <RestaurantNearBy isRestNearByScreen={false} restNearByGetSuccessData={this.props.restNearByGetSuccessData}/>
+        <RestaurantNearBy
+          isRestNearByScreen={false}
+          restNearByGetSuccessData={this.props.restNearByGetSuccessData}
+        />
       </ScrollView>
     );
   }

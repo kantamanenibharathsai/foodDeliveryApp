@@ -1,5 +1,12 @@
 import {Component} from 'react';
-import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import {bestChoiceBellIconImg, bestChoiceBurgerImg} from '../assets';
 import {fonts} from '../constants/fonts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -17,9 +24,10 @@ import {
 } from '../redux/slices/HomeSlice';
 import {connect} from 'react-redux';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
-  navigation?: NavigationProp<ParamListBase>;
+  navigation: NavigationProp<ParamListBase>;
   bestChoiceStatus?: ApiStatusConstants;
   bestChoiceSuccessData?: BestChoicesObjectInterface[];
   bestChoiceErrMsg?: string;
@@ -30,6 +38,12 @@ class BestChoiceHome extends Component<Props> {
   componentDidMount(): void {
     if (this.props.getBestChoicesData) this.props.getBestChoicesData();
   }
+
+  plusIconFunc =  (bestChoiceItemId: string) => {
+    this.props.navigation.navigate('NearByRestaurantBigScreen', {
+      params: bestChoiceItemId
+    });
+  };
 
   renderItem = ({item: bestChoiceItem}: {item: BestChoicesObjectInterface}) => {
     return (
@@ -53,9 +67,11 @@ class BestChoiceHome extends Component<Props> {
             {bestChoiceItem.businessId.businessName}
           </Text>
         </View>
-        <View style={styles.whiteCircle}>
+        <TouchableOpacity
+          style={styles.whiteCircle}
+          onPress={() => this.plusIconFunc(bestChoiceItem.businessId._id)}>
           <AntDesign name="plus" size={25} />
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };

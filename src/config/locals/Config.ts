@@ -8,4 +8,5 @@ export const endPoints = {
   TODAY_SPECIAL: 'todayspecials/?active=true',
   BEST_CHOICES: 'bestchoice/best-choice',
   REST_NEARBY: 'business/nearby',
+  BEST_CHOICES_NEARBY_REST: 'bestchoice/business/',
 };
