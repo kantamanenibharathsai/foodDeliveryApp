@@ -5,6 +5,7 @@ import {ImageSourcePropType} from 'react-native';
 
 export type ApiStatusConstants = 'Initial' | 'Loading' | 'Success' | 'Failed';
 
+export 
 interface CategoryIdData {
   _id: string;
   name: string;
@@ -87,6 +88,30 @@ export interface RestaurantNearByGetInterface {
   distance: number;
 }
 
+export interface TodaysSpecialGetNearByRestInterface {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  categoryId: string;
+  images: string[];
+  subCategory: string;
+  price: number;
+  quantity: number;
+  units: string;
+  businessId: string;
+  discountPrice: number;
+  weight: number;
+  isActive: boolean;
+  packingCharge: number;
+  sizes: string[];
+  isTodaySpecial: boolean;
+  specialDayDate: string;
+  isBestChoice: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface HomeStateInterface {
   bestChoiceStatus: ApiStatusConstants;
   bestChoiceSuccessData: BestChoicesObjectInterface[];
@@ -100,29 +125,15 @@ export interface HomeStateInterface {
   bestChoiceNearByRestStatus: ApiStatusConstants;
   bestChoiceNearByRestSuccessData: BestChoiceNearByRestProductInterface[];
   bestChoiceNearByRestErrData: '';
-}
-
-export interface TodaysSpecialNearByRestProductInterface {
-  _id: string;
-  name: string;
-  description: string;
-  category: string;
-  categoryId: string;
-  images: string[];
-  subCategory: string | null;
-  price: number;
-  quantity: number;
-  units: string;
-  businessId: string;
-  discountPrice: number;
-  weight: number;
-  isActive: boolean;
-  packingCharge: number;
-  isTodaySpecial: boolean;
-  specialDayDate: string | null;
-  isBestChoice: boolean;
-  createdAt: string;
-  updatedAt: string;
+  categoriesNearByRestStatus: ApiStatusConstants;
+  categoriesNearByRestSuccessData: nearByRestCategoriesInterface[];
+  categoriesNearByRestErrData: string;
+  todaysSpecialRestNearByGetStatus: ApiStatusConstants;
+  todaysSpecialRestNearByGetSuccessData: TodaysSpecialGetNearByRestInterface[];
+  todaysSpecialRestNearByGetErrData: string;
+  homeCategoriesGetStatus: ApiStatusConstants;
+  homeCategoriesGetSuccessData: CategoryIdData[];
+  homeCategoriesGetErrData: string;
 }
 
 export interface BestChoiceNearByRestProductInterface {
@@ -148,6 +159,15 @@ export interface BestChoiceNearByRestProductInterface {
   updatedAt: string;
 }
 
+export interface nearByRestCategoriesInterface {
+  _id: string;
+  name: string;
+  description: string;
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const initialState: HomeStateInterface = {
   bestChoiceStatus: 'Initial',
   bestChoiceSuccessData: [],
@@ -161,6 +181,15 @@ export const initialState: HomeStateInterface = {
   bestChoiceNearByRestStatus: 'Initial',
   bestChoiceNearByRestSuccessData: [],
   bestChoiceNearByRestErrData: '',
+  categoriesNearByRestStatus: 'Initial',
+  categoriesNearByRestSuccessData: [],
+  categoriesNearByRestErrData: '',
+  todaysSpecialRestNearByGetStatus: 'Initial',
+  todaysSpecialRestNearByGetSuccessData: [],
+  todaysSpecialRestNearByGetErrData: '',
+  homeCategoriesGetStatus: 'Initial',
+  homeCategoriesGetSuccessData: [],
+  homeCategoriesGetErrData: '',
 };
 
 export const bestChoiceAction = createAsyncThunk(
@@ -260,6 +289,35 @@ export const restNearByGetGetAction = createAsyncThunk(
 
 export const bestChoiceNearByRestAction = createAsyncThunk(
   'bestChoiceNearByRestAction',
+  async (payload: string, {rejectWithValue}) => {
+    try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: jwtToken || '',
+        },
+      };
+      const response = await fetch(
+        `${baseURL}/${endPoints.BEST_CHOICES_NEARBY_REST}/${payload}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const bestChoiceData = await response.json();
+      //  console.log('MMMMMMMM', bestChoiceData);
+      return bestChoiceData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
+
+export const nearByRestCategoriesGetAction = createAsyncThunk(
+  'nearByRestCategoriesGetAction',
   async (_, {rejectWithValue}) => {
     try {
       const jwtToken = await AsyncStorage.getItem('jwtToken');
@@ -271,15 +329,71 @@ export const bestChoiceNearByRestAction = createAsyncThunk(
         },
       };
       const response = await fetch(
-        `${baseURL}/${endPoints.BEST_CHOICES_NEARBY_REST}`,
+        `${baseURL}/${endPoints.CATEGORIES_GET_NEARBY_REST}`,
         options,
       );
       if (!response.ok) {
         const errorData = await response.json();
         return rejectWithValue(errorData.error.error || 'An error occurred');
       }
-      const bestChoiceData = await response.json();
-      return bestChoiceData;
+      const categoriesData = await response.json();
+      return categoriesData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
+
+export const todaysSpecialGetRestNearByAction = createAsyncThunk(
+  'todaysSpecialGetRestNearByAction',
+  async (payload: string, {rejectWithValue}) => {
+    try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: jwtToken || '',
+        },
+      };
+      const response = await fetch(
+        `${baseURL}/${endPoints.TODAY_SPECIALS_REST_NEAR_BY}/${payload}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const todaySpecialsData = await response.json();
+      return todaySpecialsData;
+    } catch (error) {
+      return rejectWithValue('Network request failed');
+    }
+  },
+);
+
+export const homeCategoriesGetAction = createAsyncThunk(
+  'homeCategoriesGetAction',
+  async (_, {rejectWithValue}) => {
+    try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: jwtToken || '',
+        },
+      };
+      const response = await fetch(
+        `${baseURL}/${endPoints.CATEGORIES_GET_HOME}`,
+        options,
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData.error.error || 'An error occurred');
+      }
+      const categoriesData = await response.json();
+      return categoriesData;
     } catch (error) {
       return rejectWithValue('Network request failed');
     }
@@ -346,13 +460,72 @@ const HomeSlice = createSlice({
     });
     builder.addCase(bestChoiceNearByRestAction.fulfilled, (state, action) => {
       state.bestChoiceNearByRestStatus = 'Success';
-      state.bestChoiceNearByRestSuccessData = action.payload;
+      state.bestChoiceNearByRestSuccessData = action.payload.data.bestChoice;
       state.bestChoiceNearByRestErrData = '';
     });
     builder.addCase(bestChoiceNearByRestAction.rejected, (state, action) => {
       state.bestChoiceNearByRestStatus = 'Failed';
       state.bestChoiceNearByRestSuccessData = [];
       state.bestChoiceNearByRestErrData = '';
+    });
+
+    builder.addCase(nearByRestCategoriesGetAction.pending, state => {
+      state.categoriesNearByRestStatus = 'Loading';
+      state.categoriesNearByRestSuccessData = [];
+      state.categoriesNearByRestErrData = '';
+    });
+    builder.addCase(
+      nearByRestCategoriesGetAction.fulfilled,
+      (state, action) => {
+        console.log('Ccccccccccccc', action.payload.data.categories);
+        state.categoriesNearByRestStatus = 'Success';
+        state.categoriesNearByRestSuccessData = action.payload.data.categories;
+        state.categoriesNearByRestErrData = '';
+      },
+    );
+    builder.addCase(nearByRestCategoriesGetAction.rejected, (state, action) => {
+      state.categoriesNearByRestStatus = 'Failed';
+      state.categoriesNearByRestSuccessData = [];
+      state.categoriesNearByRestErrData = '';
+    });
+
+    builder.addCase(todaysSpecialGetRestNearByAction.pending, state => {
+      state.todaysSpecialRestNearByGetStatus = 'Loading';
+      state.todaysSpecialRestNearByGetSuccessData = [];
+      state.todaysSpecialRestNearByGetErrData = '';
+    });
+    builder.addCase(
+      todaysSpecialGetRestNearByAction.fulfilled,
+      (state, action) => {
+        state.todaysSpecialRestNearByGetStatus = 'Success';
+        state.todaysSpecialRestNearByGetSuccessData =
+          action.payload.data.product;
+        state.todaysSpecialRestNearByGetErrData = '';
+      },
+    );
+    builder.addCase(
+      todaysSpecialGetRestNearByAction.rejected,
+      (state, action) => {
+        state.todaysSpecialRestNearByGetStatus = 'Failed';
+        state.todaysSpecialRestNearByGetSuccessData = [];
+        state.todaysSpecialRestNearByGetErrData = '';
+      },
+    );
+
+    builder.addCase(homeCategoriesGetAction.pending, state => {
+      state.restNearByGetStatus = 'Loading';
+      state.restNearByGetSuccessData = [];
+      state.restNearByGetErrData = '';
+    });
+    builder.addCase(homeCategoriesGetAction.fulfilled, (state, action) => {
+      state.restNearByGetStatus = 'Success';
+      state.restNearByGetSuccessData = action.payload;
+      state.restNearByGetErrData = '';
+    });
+    builder.addCase(homeCategoriesGetAction.rejected, (state, action) => {
+      state.restNearByGetStatus = 'Failed';
+      state.restNearByGetSuccessData = [];
+      state.restNearByGetErrData = '';
     });
   },
 });

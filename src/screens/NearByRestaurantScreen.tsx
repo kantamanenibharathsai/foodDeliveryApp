@@ -17,15 +17,20 @@ import {
   responsiveFontSize,
   responsiveHeight,
   responsiveWidth,
-  useResponsiveWidth,
 } from 'react-native-responsive-dimensions';
 import RatingComponent from '../components/RatingComponent';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {foodHomeImages} from '../utils/Data';
-import BestChoiceHome from '../components/BestChoiceHome';
 import TodaySpecial from '../components/TodaySpecial';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
-import { galleryImg } from '../assets';
+import {categoryPizzaImg, galleryImg} from '../assets';
+import {
+  ApiStatusConstants,
+  nearByRestCategoriesGetAction,
+  nearByRestCategoriesInterface,
+} from '../redux/slices/HomeSlice';
+import {AppDispatch, RootState} from '../redux/store';
+import {connect} from 'react-redux';
+import BestChoiceNearByRest from '../components/BestChoiceNearByRest';
 
 interface Person {
   id: string;
@@ -81,6 +86,11 @@ const teamData: Person[] = [
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  route: {params: {bestChoiceItemId: string}};
+  categoriesNearByRestStatus: ApiStatusConstants;
+  categoriesNearByRestSuccessData: nearByRestCategoriesInterface[];
+  categoriesNearByRestErrData: string;
+  getRestNearByCategoriesData: () => void;
 }
 class NearByRestaurantBigScreen extends Component<Props> {
   handleGoBack = () => {
@@ -106,13 +116,22 @@ class NearByRestaurantBigScreen extends Component<Props> {
       </View>
     </View>
   );
+
+  componentDidMount(): void {
+    this.props.getRestNearByCategoriesData();
+  }
+
   render() {
+    console.log(
+      'Aaaaaaaaaaaaaaaaa',
+      this.props.categoriesNearByRestSuccessData
+    );
     return (
       <ScrollView style={styles.container}>
         <View style={styles.nearbyResHeader}>
           <TouchableOpacity onPress={this.handleGoBack} style={styles.leftIcon}>
             <Entypo name="chevron-small-left" size={30} color={colors.black} />
-          </TouchableOpacity> 
+          </TouchableOpacity>
           <Text style={styles.nearByResText}>Nearby Restaurant</Text>
         </View>
         <View style={styles.bodyCont}>
@@ -145,9 +164,13 @@ class NearByRestaurantBigScreen extends Component<Props> {
             <FlatList
               contentContainerStyle={styles.flatListHomeStyle}
               horizontal
-              data={foodHomeImages}
+              data={this.props.categoriesNearByRestSuccessData}
+              keyExtractor={item => item._id}
               renderItem={({item}) => (
-                <Image style={styles.foodImg} source={item.image} />
+                <View style={styles.colorCont}>
+                  <Text style={styles.categoryTxt}>{item.name}</Text>
+                  <Image style={styles.foodImg} source={categoryPizzaImg} />
+                </View>
               )}
               showsHorizontalScrollIndicator={false}
             />
@@ -155,7 +178,10 @@ class NearByRestaurantBigScreen extends Component<Props> {
 
           <View style={styles.categoryCont}>
             <Text style={styles.name}>Best Choice</Text>
-            <BestChoiceHome />
+            <BestChoiceNearByRest
+              businessId={this.props.route.params.bestChoiceItemId}
+              navigation={this.props.navigation}
+            />
           </View>
 
           <View style={styles.todaySpecialCont}>
@@ -211,7 +237,7 @@ class NearByRestaurantBigScreen extends Component<Props> {
           </View>
 
           <View style={styles.phoneImageCont}>
-            <Entypo name="phone" color={colors.white} size={30}/>
+            <Entypo name="phone" color={colors.white} size={30} />
           </View>
         </View>
       </ScrollView>
@@ -219,7 +245,22 @@ class NearByRestaurantBigScreen extends Component<Props> {
   }
 }
 
-export default NearByRestaurantBigScreen;
+const mapStateToProps = (state: RootState) => {
+  return {
+    categoriesNearByRestStatus: state.home.categoriesNearByRestStatus,
+    categoriesNearByRestSuccessData: state.home.categoriesNearByRestSuccessData,
+    categoriesNearByRestErrData: state.home.categoriesNearByRestErrData,
+  };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  getRestNearByCategoriesData: () => dispatch(nearByRestCategoriesGetAction()),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(NearByRestaurantBigScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -356,7 +397,7 @@ const styles = StyleSheet.create({
 
   foodImg: {
     resizeMode: 'cover',
-    width: 153,
+    width: 76,
     height: 65,
   },
 
@@ -475,5 +516,25 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  colorCont: {
+    width: 153,
+    height: 65,
+    borderRadius: 10,
+    backgroundColor: '#fe5656',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  categoryTxt: {
+    fontSize: responsiveFontSize(1.8),
+    color: colors.white,
+    fontFamily: fonts.bai.medium,
+    paddingLeft: responsiveWidth(2.5),
+    width: responsiveWidth(19),
+    // borderWidth: 1,
+    // borderColor: "#000"
   },
 });

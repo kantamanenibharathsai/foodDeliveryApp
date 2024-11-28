@@ -30,6 +30,8 @@ import {
   ApiStatusConstants,
   bestChoiceAction,
   BestChoicesObjectInterface,
+  CategoryIdData,
+  homeCategoriesGetAction,
   RestaurantNearByGetInterface,
   restNearByGetGetAction,
   todaysSpecialGetAction,
@@ -39,6 +41,7 @@ import {connect} from 'react-redux';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  
   bestChoiceStatus: ApiStatusConstants;
   bestChoiceSuccessData: BestChoicesObjectInterface[];
   bestChoiceErrMsg: string;
@@ -52,6 +55,11 @@ interface Props {
   restNearByGetSuccessData: RestaurantNearByGetInterface[];
   restNearByGetErrData: string;
   restNearByGetDataFunc: () => void;
+
+  homeCategoriesGetStatus: ApiStatusConstants;
+  homeCategoriesGetSuccessData: CategoryIdData[];
+  homeCategoriesGetErrData: string;
+  homeCategoriesGetDataFunc: () => void;
 }
 class HomeScreen extends Component<Props> {
   mapHandler = () => {
@@ -68,7 +76,6 @@ class HomeScreen extends Component<Props> {
   }
 
   render() {
-
     return (
       <ScrollView style={styles.container}>
         <View style={styles.cont}>
@@ -167,15 +174,19 @@ const mapStateToProps = (state: RootState) => ({
 
   restNearByGetStatus: state.home.restNearByGetStatus,
   restNearByGetSuccessData: state.home.restNearByGetSuccessData,
-  restNearByGetErrData: state.home.restNearByGetErrData
+  restNearByGetErrData: state.home.restNearByGetErrData,
 
+  homeCategoriesGetStatus: state.home.homeCategoriesGetStatus,
+  homeCategoriesGetSuccessData: state.home.homeCategoriesGetSuccessData,
+  homeCategoriesGetErrData: state.home.homeCategoriesGetErrData,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     getBestChoicesData: () => dispatch(bestChoiceAction()),
     todaysSpecialGetDataFunc: () => dispatch(todaysSpecialGetAction()),
-    restNearByGetDataFunc : () => dispatch(restNearByGetGetAction())
+    restNearByGetDataFunc: () => dispatch(restNearByGetGetAction()),
+    homeCategoriesGetDataFunc: () => dispatch(homeCategoriesGetAction()),
   };
 };
 

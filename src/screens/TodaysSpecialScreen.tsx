@@ -1,5 +1,12 @@
 import {Component} from 'react';
-import {View, Text, StyleSheet, Platform, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import {fonts} from '../constants/fonts';
 import {colors} from '../utils/Colors';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -9,15 +16,35 @@ import {
   responsiveHeight,
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
+import {
+  ApiStatusConstants,
+  todaysSpecialGetAction,
+  TodaysSpecialGetInterface,
+} from '../redux/slices/HomeSlice';
+import {connect} from 'react-redux';
+import {AppDispatch, RootState} from '../redux/Store';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
+  todaysSpecialGetStatus: ApiStatusConstants;
+  todaysSpecialGetSuccessData: TodaysSpecialGetInterface[];
+  todaysSpecialGetErrData: string;
+  todaysSpecialGetDataFunc: () => void;
 }
 
 class TodaySpecialScreen extends Component<Props> {
+  constructor(props: Props) {
+    super(props);
+  }
+
   handleGoBack = () => {
     this.props.navigation.goBack();
   };
+
+  componentDidMount(): void {
+    this.props.todaysSpecialGetDataFunc();
+  }
+
   render() {
     return (
       <View style={styles.todaySpecialCont}>
@@ -28,14 +55,38 @@ class TodaySpecialScreen extends Component<Props> {
           <Text style={styles.restNearByText}>Today Special</Text>
         </View>
         <View style={styles.bodyCont}>
-          <TodaySpecial />
+          {this.props.todaysSpecialGetStatus === 'Loading' ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.green}
+              style={styles.loader}
+            />
+          ) : (
+            <TodaySpecial
+              todaysSpecialGetSuccessData={
+                this.props.todaysSpecialGetSuccessData
+              }
+            />
+          )}
         </View>
       </View>
     );
   }
 }
 
-export default TodaySpecialScreen;
+const mapStateToProps = (state: RootState) => ({
+  todaysSpecialGetStatus: state.home.todaysSpecialGetStatus,
+  todaysSpecialGetSuccessData: state.home.todaysSpecialGetSuccessData,
+  todaysSpecialGetErrData: state.home.todaysSpecialGetErrData,
+});
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    todaysSpecialGetDataFunc: () => dispatch(todaysSpecialGetAction()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodaySpecialScreen);
 
 const styles = StyleSheet.create({
   todaySpecialCont: {
@@ -68,8 +119,15 @@ const styles = StyleSheet.create({
   },
 
   bodyCont: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: responsiveWidth(0.5),
     paddingVertical: responsiveHeight(2),
-    paddingHorizontal: responsiveWidth(4),
     paddingBottom: 100,
+    paddingRight: responsiveWidth(2.5)
+  },
+  loader: {
+    alignSelf: 'center',
   },
 });

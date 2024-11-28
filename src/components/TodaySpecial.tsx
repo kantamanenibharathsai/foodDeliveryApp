@@ -13,12 +13,10 @@ import {dishImg, todaySpecialImg} from '../assets';
 import {colors} from '../utils/Colors';
 import {fonts} from '../constants/fonts';
 import {
-  NavigationProp,
-  RouteProp,
-  ParamListBase,
-} from '@react-navigation/native';
-import {TodaysSpecialGetInterface} from '../redux/slices/HomeSlice';
+  TodaysSpecialGetInterface,
+} from '../redux/slices/HomeSlice';
 import {responsiveWidth} from 'react-native-responsive-dimensions';
+
 export interface FoodItem {
   id: string;
   name: string;
@@ -27,98 +25,31 @@ export interface FoodItem {
   restaurant: string;
   image: ImageSourcePropType;
 }
-
-interface RootStackParamList extends ParamListBase {
-  auth: undefined;
-  home: undefined;
-  'terms-and-conditions': undefined;
-  'verify-otp': undefined;
-  'forgot-password': undefined;
-}
-
 interface TodaySpecialProps {
-  todaysSpecialGetSuccessData: TodaysSpecialGetInterface[];
-}
-interface TodaySpecialState {
-  data: FoodItem[];
+  todaysSpecialGetSuccessData?: TodaysSpecialGetInterface[];
+  // businessId?: string;
+  // todaysSpecialGetRestNearByDataFunc?: (businessId: string) => void;
+  // todaysSpecialRestNearByGetSuccessData?: TodaysSpecialGetNearByRestInterface[];
+  // todaysSpecialRestNearByGetErrData?: string;
+  // todaysSpecialRestNearByGetStatus?: ApiStatusConstants;
 }
 
-export const foodData: FoodItem[] = [
-  {
-    id: '1',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '2',
-    name: 'Chicken Tikka',
-    price: '₹80',
-    originalPrice: '₹120',
-    restaurant: 'Barbeque Nation',
-    image: todaySpecialImg,
-  },
-  {
-    id: '3',
-    name: 'Pizza',
-    price: '₹90',
-    originalPrice: '₹140',
-    restaurant: 'Naivedhyam Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '4',
-    name: 'Chicken Biryani',
-    price: '₹60',
-    originalPrice: '₹80',
-    restaurant: 'Saoji Bhojnalaya',
-    image: todaySpecialImg,
-  },
-  {
-    id: '5',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '6',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '7',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-  {
-    id: '8',
-    name: 'Bset Veg Dum Biryani',
-    price: '₹100',
-    originalPrice: '₹200',
-    restaurant: 'Golden Fish Restaurant',
-    image: todaySpecialImg,
-  },
-];
 
-class TodaySpecial extends React.Component<
-  TodaySpecialProps,
-  TodaySpecialState
-> {
+class TodaySpecial extends React.Component<TodaySpecialProps, {}> {
   constructor(props: TodaySpecialProps) {
     super(props);
-    this.state = {
-      data: foodData,
-    };
+  }
+
+  componentDidMount(): void {
+    // if (
+    //   this.props.businessId &&
+    //   this.props.todaysSpecialGetRestNearByDataFunc
+    // ) {
+    //   this.props.todaysSpecialGetRestNearByDataFunc(this.props.businessId);
+    // } else if (this.props.todaysSpecialGetDataFunc) {
+    //   console.log('componentdidmountcalled');
+    //   this.props.todaysSpecialGetDataFunc();
+    // }
   }
 
   renderItem: ListRenderItem<TodaysSpecialGetInterface> = ({item}) => (
@@ -141,6 +72,10 @@ class TodaySpecial extends React.Component<
   );
 
   render() {
+    console.log(
+      'this.props.todaysSpecialGetSuccessData',
+      this.props.todaysSpecialGetSuccessData,
+    );
     return (
       <FlatList
         data={this.props.todaysSpecialGetSuccessData}
@@ -159,12 +94,31 @@ class TodaySpecial extends React.Component<
   }
 }
 
+// const mapStateToProps = (state: RootState) => ({
+//   // todaysSpecialGetStatus: state.home.todaysSpecialGetStatus,
+//   // todaysSpecialGetSuccessData: state.home.todaysSpecialGetSuccessData,
+//   // todaysSpecialGetErrData: state.home.todaysSpecialGetErrData,
+//   // todaysSpecialRestNearByGetStatus: state.home.todaysSpecialGetStatus,
+//   // todaysSpecialRestNearByGetSuccessData: state.home.todaysSpecialGetSuccessData,
+//   // todaysSpecialRestNearByGetErrData:
+//   //   state.home.todaysSpecialRestNearByGetErrData,
+// });
+
+// const mapDispatchToProps = (dispatch: AppDispatch) => {
+//   return {
+//     // todaysSpecialGetDataFunc: () => dispatch(todaysSpecialGetAction()),
+//     // todaysSpecialGetRestNearByDataFunc: (businessId: string) =>
+//     //   dispatch(todaysSpecialGetRestNearByAction(businessId)),
+//   };
+// };
+
+// export default connect(mapStateToProps, mapDispatchToProps)(TodaySpecial);
 export default TodaySpecial;
 
 const styles = StyleSheet.create({
   flatList: {
     paddingHorizontal: responsiveWidth(4),
-    marginTop: -5,
+    marginTop: -0,
   },
   card: {
     flexDirection: 'row',
@@ -186,7 +140,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    borderBottomLeftRadius: 0,
   },
   details: {
     marginLeft: 10,
@@ -198,6 +152,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.black,
     fontFamily: fonts.bai.medium,
+    width: responsiveWidth(61),
   },
   priceContainer: {
     flexDirection: 'row',

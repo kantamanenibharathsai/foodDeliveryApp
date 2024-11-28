@@ -7,7 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import {bestChoiceBellIconImg, bestChoiceBurgerImg} from '../assets';
+import {bestChoiceBurgerImg} from '../assets';
 import {fonts} from '../constants/fonts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {colors} from '../utils/Colors';
@@ -19,32 +19,32 @@ import {
 import {AppDispatch, RootState} from '../redux/store';
 import {
   ApiStatusConstants,
-  bestChoiceAction,
-  BestChoicesObjectInterface,
+  bestChoiceNearByRestAction,
+  BestChoiceNearByRestProductInterface,
 } from '../redux/slices/HomeSlice';
 import {connect} from 'react-redux';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 
 interface Props {
   navigation: NavigationProp<ParamListBase>;
-  bestChoiceStatus?: ApiStatusConstants;
-  bestChoiceSuccessData?: BestChoicesObjectInterface[];
-  bestChoiceErrMsg?: string;
-  getBestChoicesData?: () => void;
+  businessId: string;
+  getBestChoicesNearByRestData?: (businessId: string) => void;
+  bestChoiceNearByRestStatus: ApiStatusConstants;
+  bestChoiceNearByRestSuccessData: BestChoiceNearByRestProductInterface[];
+  bestChoiceNearByRestErrData: string;
 }
 
-class BestChoiceHome extends Component<Props> {
+class BestChoiceNearByRest extends Component<Props> {
   componentDidMount(): void {
-    if (this.props.getBestChoicesData) this.props.getBestChoicesData();
+    if (this.props.getBestChoicesNearByRestData)
+      this.props.getBestChoicesNearByRestData(this.props.businessId);
   }
 
-  plusIconFunc =  (bestChoiceItemId: string) => {
-    this.props.navigation.navigate('NearByRestaurantBigScreen', {
-      bestChoiceItemId
-    });
-  };
-
-  renderItem = ({item: bestChoiceItem}: {item: BestChoicesObjectInterface}) => {
+  renderItem = ({
+    item: bestChoiceItem,
+  }: {
+    item: BestChoiceNearByRestProductInterface;
+  }) => {
     return (
       <View style={styles.bestChoiceHomeCont}>
         <View style={styles.bestChoiceFoodImgCont}>
@@ -54,21 +54,13 @@ class BestChoiceHome extends Component<Props> {
           />
         </View>
         <View style={styles.bodyCont}>
-          <Text style={styles.bestChoiceFoodText}>
-            {bestChoiceItem.category}
-          </Text>
+          <Text style={styles.bestChoiceFoodText}>{bestChoiceItem.name}</Text>
           <View style={styles.rupeeCont}>
             <FontAwesome name="rupee" color={colors.red} size={15} />
             <Text style={styles.price}>{bestChoiceItem.price}</Text>
           </View>
-          <Image source={bestChoiceBellIconImg} style={styles.bellIconImg} />
-          <Text style={styles.restaurantName}>
-            {bestChoiceItem.businessId.businessName}
-          </Text>
         </View>
-        <TouchableOpacity
-          style={styles.whiteCircle}
-          onPress={() => this.plusIconFunc(bestChoiceItem.businessId._id)}>
+        <TouchableOpacity style={styles.whiteCircle}>
           <AntDesign name="plus" size={25} />
         </TouchableOpacity>
       </View>
@@ -78,7 +70,7 @@ class BestChoiceHome extends Component<Props> {
   render() {
     return (
       <FlatList
-        data={this.props.bestChoiceSuccessData}
+        data={this.props.bestChoiceNearByRestSuccessData}
         renderItem={this.renderItem}
         keyExtractor={item => item._id}
         horizontal
@@ -90,27 +82,31 @@ class BestChoiceHome extends Component<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  bestChoiceStatus: state.home.bestChoiceStatus,
-  bestChoiceSuccessData: state.home.bestChoiceSuccessData,
-  loginErrMsg: state.auth.loginErrMsg,
+  bestChoiceNearByRestStatus: state.home.bestChoiceNearByRestStatus,
+  bestChoiceNearByRestSuccessData: state.home.bestChoiceNearByRestSuccessData,
+  bestChoiceNearByRestErrData: state.home.bestChoiceNearByRestErrData,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
-  getBestChoicesData: () => dispatch(bestChoiceAction()),
+  getBestChoicesNearByRestData: (businessId: string) =>
+    dispatch(bestChoiceNearByRestAction(businessId)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BestChoiceHome);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(BestChoiceNearByRest);
 
 const styles = StyleSheet.create({
   flatList: {
     gap: 20,
-    paddingHorizontal: responsiveWidth(3.8),
+    paddingRight: responsiveWidth(3),
   },
 
   bestChoiceHomeCont: {
     backgroundColor: '#FFF3E5',
     borderRadius: 20,
-    height: 245,
+    height: 155,
     width: 165,
     alignItems: 'center',
     position: 'relative',

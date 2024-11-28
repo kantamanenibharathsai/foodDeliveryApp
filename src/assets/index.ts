@@ -68,3 +68,4 @@ export const cashOnDeliveryImg = require('../assets/images/cashOnDeliveryImg.png
 export const sbiLogoImg = require('../assets/images/sbiLogo.png');
 export const creditCardSmallImg = require("../assets/images/creditCardSmallImg.png");
 export const tickGreenImg = require("../assets/images/tickGreenImg.png");
+export const categoryPizzaImg = require("../assets/images/categoryPizzaImg.png");
